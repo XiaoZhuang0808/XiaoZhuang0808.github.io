@@ -18,4 +18,31 @@
 <p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
 ]]></content>
   </entry>
+  <entry>
+    <title>postname</title>
+    <url>/2018/09/15/postname/</url>
+    <content><![CDATA[<h2 id="一、MVVM框架"><a href="#一、MVVM框架" class="headerlink" title="一、MVVM框架"></a>一、MVVM框架</h2><p>再说react之前，我认为有必要先简单了解一下MVVM框架。提一嘴，建议百度进行跟深入的了解。</p><a id="more"></a>
+<ul>
+<li>什么是MVVM？<ul>
+<li>MVVM主要包括三个部分 Model View VlewModel<ul>
+<li>Models是数据部分对应钱盾js对象<ul>
+<li>View值的是视图部分<ul>
+<li>ViewModel是连接数据和视图的中间件</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>vue</category>
+      </categories>
+      <tags>
+        <tag>vue框架</tag>
+      </tags>
+  </entry>
 </search>
