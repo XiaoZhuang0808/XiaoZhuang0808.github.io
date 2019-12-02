@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="渔夫的美好生活" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="JavaScript JavaScript是运行在浏览器端的脚本语言，JavaScript主要解决的是前端与用户交互的问题 是一种动态性、弱类型的语言； 他的解释器就在我们的浏览器中，是浏览器的一部分 这门语言对大小写敏感，并会忽略多余的空格，可以使用\进行代码换行，注释使用//或/**/">
+<meta name="keywords" content="javaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Paramiko">
+<meta property="og:url" content="http://xiaozhuang.tech/2017/09/15/javascript/index.html">
+<meta property="og:site_name" content="渔夫的美好生活">
+<meta property="og:description" content="JavaScript JavaScript是运行在浏览器端的脚本语言，JavaScript主要解决的是前端与用户交互的问题 是一种动态性、弱类型的语言； 他的解释器就在我们的浏览器中，是浏览器的一部分 这门语言对大小写敏感，并会忽略多余的空格，可以使用\进行代码换行，注释使用//或/**/">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-02T03:59:24.271Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Paramiko">
+<meta name="twitter:description" content="JavaScript JavaScript是运行在浏览器端的脚本语言，JavaScript主要解决的是前端与用户交互的问题 是一种动态性、弱类型的语言； 他的解释器就在我们的浏览器中，是浏览器的一部分 这门语言对大小写敏感，并会忽略多余的空格，可以使用\进行代码换行，注释使用//或/**/">
+
+<link rel="canonical" href="http://xiaozhuang.tech/2017/09/15/javascript/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Paramiko | 渔夫的美好生活</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">渔夫的美好生活</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">记录美好生活</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaozhuang.tech/2017/09/15/javascript/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cao.jpg">
+      <meta itemprop="name" content="Xiao Zhuang">
+      <meta itemprop="description" content="记录生活点点滴滴">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="渔夫的美好生活">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Paramiko
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-09-15 11:42:00" itemprop="dateCreated datePublished" datetime="2017-09-15T11:42:00+08:00">2017-09-15</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/前端/" itemprop="url" rel="index">
+                    <span itemprop="name">前端</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><blockquote>
+<p><code>JavaScript</code>是运行在浏览器端的脚本语言，<code>JavaScript</code>主要解决的是前端与用户交互的问题</p>
+<p>是一种动态性、弱类型的语言；</p>
+<p>他的解释器就在我们的浏览器中，是浏览器的一部分</p>
+<p>这门语言对<strong>大小写敏感</strong>，并会忽略多余的空格，可以使用<code>\</code>进行代码换行，注释使用<code>//</code>或<code>/**/</code></p>
+</blockquote><a id="more"></a>
+<ul>
+<li>主要由三部分组成<ul>
+<li><code>ECMAScript</code>：语言的语法和基本对象</li>
+<li>文档对象模型<code>Dom(Document Object Model)</code>：处理网页内容的方法和接口</li>
+<li>浏览器对象模型<code>Bom(BrowserObjectModel)</code>：与浏览器进行交互的方法和接口</li>
+</ul>
+</li>
+<li>前端三大部<ul>
+<li><code>HTML</code>：页面的内容、结构</li>
+<li><code>CSS</code>：页面的表现形式、<strong>部分动画</strong></li>
+<li><code>JavaScript</code>：页面的行为、交互、<strong>功能</strong></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="JavaScript引入"><a href="#JavaScript引入" class="headerlink" title="JavaScript引入"></a>JavaScript引入</h3><ul>
+<li>行间事件：为某一个具体的元素标签赋予<code>js</code>内容</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;input type=&quot;button&quot; value=&quot;按钮&quot; onclick=&quot;alert(&apos;点我&apos;);&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>嵌入引入：在文档页面通过<code>Script</code>标签嵌入</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;head&gt;</span><br><span class="line">	&lt;title&gt;&lt;/title&gt;</span><br><span class="line">	&lt;script type=&quot;text/javascript&quot;&gt;</span><br><span class="line">		alert(&quot;ok!&quot;);</span><br><span class="line">	&lt;/script&gt;</span><br><span class="line">&lt;/head&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>外部引入：定义单独<code>js</code>文件，通过<code>script</code>标签进行引入</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script type=&quot;text/javascript&quot; src=&quot;js/main.js&quot;&gt;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>alert</code>函数用来展示一个提示框</p>
+</blockquote>
+<h3 id="变量定义"><a href="#变量定义" class="headerlink" title="变量定义"></a>变量定义</h3><ul>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var x = 1</span><br><span class="line">var y = &quot;2&quot;</span><br><span class="line">var z = 2</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>定义变量需要使用关键字：<code>var</code></p>
+<ul>
+<li>同时定义多个变量可以使用 <strong>，</strong> 隔开</li>
+</ul>
+</li>
+<li><p><strong>注意</strong>：<code>javascript</code>变量均为对象，每当声明一个变量，就相当于创建了一个对象</p>
+</li>
+<li><p>命名规则：</p>
+<ol>
+<li>区分大小写</li>
+<li>首字符为<strong>字母</strong>、<strong>数字</strong>、<strong>下划线</strong><code>_</code>、或<strong>美元符号</strong><code>$</code></li>
+<li>其他字符可以为<strong>字母</strong>、<strong>数字</strong>、<strong>下划线</strong>、<strong>美元符号</strong></li>
+</ol>
+</li>
+<li><p>调试程序的方法：</p>
+<ul>
+<li><code>alert</code>：弹框</li>
+<li><code>console.log()</code>：浏览器控制台</li>
+<li><code>document.title()</code>：页面标题</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="基本数据类型"><a href="#基本数据类型" class="headerlink" title="基本数据类型"></a>基本数据类型</h3><ul>
+<li><code>Number</code>：<strong>数字类型</strong>，可以带小数点，也可以不带</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var a = 1;</span><br><span class="line">var b = 1.5;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>String</code>：<strong>字符串类型</strong>，可以使用<strong>单引号</strong>或<strong>双引号</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var a = &quot;abc&quot;;</span><br><span class="line">var b = &quot;aaaa&quot; + 1</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>Boolean</code>：<strong>布尔类型</strong>，只能是<code>true</code>|<code>false</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var a = true;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>undefined</code>：<strong>未定义类型</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var a;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>null</code>：<strong>空对象类型</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var a = null;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查看变量数据类型</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var x = &quot;abc&quot;;</span><br><span class="line">alert(typeof x)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>匈牙利命名规则：<ul>
+<li>对象 <code>o</code> (<code>Object</code>)：<code>oPerson</code></li>
+<li>数组 <code>a</code> (<code>Array</code>)：<code>aUsers</code></li>
+<li>字符串 <code>s</code> (<code>String</code>)：<code>sAccount</code></li>
+<li>整数 <code>i</code> (<code>Integer</code>)：<code>iScore</code></li>
+<li>布尔值 <code>b</code> (<code>Boolean</code>)：<code>bIsLogin</code></li>
+<li>浮点数 <code>f</code> (<code>Float</code>)：<code>fPrice</code></li>
+<li>函数 <code>f</code> (<code>Function</code>)：<code>fEats</code></li>
+<li>正则 <code>re</code> (<code>RegExp</code>)：<code>reIDCard</code></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h3><ul>
+<li>转换为字符串：<code>toString</code>，支持<code>Boolean</code>、<code>Number</code>、<code>String</code>三种主要类型</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var x = 1;</span><br><span class="line">var y = &quot;abc&quot;;</span><br><span class="line">var z = true;</span><br><span class="line">alert(x.toString()) // &quot;1&quot;</span><br><span class="line">alert(y.toString()) // &quot;abc&quot;</span><br><span class="line">alert(z.toString()) // &quot;true&quot;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>转换为数字：<strong>parseInt</strong>、<strong>parseFloat</strong>，将只含有数字的字符串变为整形或浮点型，其他类型返回<code>NaN</code>()</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">var x = &quot;123&quot;</span><br><span class="line">var y = &quot;123.01&quot;</span><br><span class="line">var z = &quot;123aa&quot;</span><br><span class="line">alert(parseInt(x)) // 123</span><br><span class="line">alert(parseFloat(x)) // 123</span><br><span class="line">alert(parseInt(y)) // 123</span><br><span class="line">alert(parseFloat(y)) // 123.01</span><br><span class="line">alert(parseInt(z)) // 123</span><br><span class="line">alert(parseFloat(z)) // 123</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>注意</strong>：<code>parseFloat</code>转换的包含浮点数的字符串应该是十进制</li>
+</ul>
+<blockquote>
+<p>八进制或十六进制，该方法会忽略前导<code>0</code></p>
+<p>八进制数字<code>020</code>会被解析为<code>20</code></p>
+<p>十六进制数字<code>0xFF</code>，会返回<code>Nan</code>，因为x符号不是有效字符</p>
+</blockquote>
+<hr>
+<h4 id="强制类型转换"><a href="#强制类型转换" class="headerlink" title="强制类型转换"></a>强制类型转换</h4><ul>
+<li><code>Boolean()</code>：当要转换的值是至少有一个字符的字符串</li>
+</ul>
+<blockquote>
+<p>非<code>0</code>数字或对象时，<code>Boolean()</code>函数将返回<code>true</code></p>
+<p>如果该值是空字符串、数字<code>0</code>、<code>undefined</code>或<code>null</code>，它将返回<code>false</code>。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">alert(Boolean(0)) // false</span><br><span class="line">alert(Boolean(1)) // true</span><br><span class="line">alert(Boolean(&quot;1&quot;)) // true</span><br><span class="line">alert(Boolean(&quot;1a&quot;)) // true</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>Number()</code>：换与<code>parseInt()</code>和<code>parseFloat()</code>方法的处理方式相似，只是它转换的是整个值，而不是部分值</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">alert(Number(false)) // 0</span><br><span class="line">alert(Number(true)) // 1</span><br><span class="line">alert(Number(undefined)) // NaN</span><br><span class="line">alert(Number(null)) // 0</span><br><span class="line">alert(Number(&quot;1.2&quot;)) // 1.2</span><br><span class="line">alert(Number(&quot;12&quot;)) // 12</span><br><span class="line">alert(Number(&quot;1.2.3&quot;)) // NaN</span><br><span class="line">alert(Number(new object())) // NaN</span><br><span class="line">alert(Number(50)) // 50</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>String()</code>：可把任何值转换成字符串</li>
+<li><strong>注意</strong>：强制转换成字符串和调用<code>toString()</code>方法的唯一不同之处在于，对<code>null</code>和<code>undefined</code>值强制类型转换可以生成字符串而不引发错误</li>
+</ul>
+<hr>
+<h3 id="复合类型"><a href="#复合类型" class="headerlink" title="复合类型"></a>复合类型</h3><ul>
+<li><code>Array</code>：数组，索引从<code>0</code>开始</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var people = [&apos;张三&apos;,&apos;李四&apos;,&apos;王五&apos;];</span><br><span class="line">var people = new Array(&apos;张三&apos;,&apos;李四&apos;,&apos;王五&apos;);</span><br><span class="line">var people = new Array();</span><br><span class="line">people[0] = &quot;张三&quot;</span><br><span class="line">people[1] = &quot;李四&quot;</span><br><span class="line">people[2] = &quot;王五&quot;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>Object</code>：对象，就像是字典，定义时<code>key</code>值不需要设置类型</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var person = &#123;</span><br><span class="line">    name: &quot;张三&quot;,</span><br><span class="line">    age: 18,</span><br><span class="line">    sex: &quot;male&quot;,</span><br><span class="line">&#125;;</span><br><span class="line">/*对象有两种访问方式：*/</span><br><span class="line">person[&quot;name&quot;]</span><br><span class="line">person.name</span><br><span class="line">var person = new Object();</span><br><span class="line">person.name = &quot;张三&quot;;</span><br><span class="line">person.age = 17;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><ul>
+<li>函数语法：包裹在<strong>花括号</strong>中的代码块，前面使用了关键词<code>function</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;button onclick=&quot;func()&quot;&gt;点击这里&lt;/button&gt;</span><br><span class="line">function func(arg1,arg2,...) &#123;</span><br><span class="line">    alert(&quot;函数被执行&quot;)</span><br><span class="line">    // 执行代码</span><br><span class="line">    return 1; // return是可选的，并且可以不写返回值，单纯只做函数终止</span><br><span class="line">&#125;</span><br><span class="line">// 函数名 func</span><br><span class="line">// 参数 arg1,arg2,...</span><br><span class="line">// 返回值 return 1</span><br><span class="line">func() // 函数执行</span><br></pre></td></tr></table></figure>
+
+<h4 id="变量作用域"><a href="#变量作用域" class="headerlink" title="变量作用域"></a>变量作用域</h4><ul>
+<li><strong>局部变量</strong></li>
+</ul>
+<blockquote>
+<p>在<code>JavaScript</code>函数内部声明的变量（使用<code>var</code>）是<strong>局部</strong>变量，</p>
+<p>只能在函数内部访问它</p>
+<p>该变量的作用域是局部的</p>
+<p><strong>生命周期</strong>：局部变量会在函数运行以后被删除 (生命期从它们被声明的时间开始)</p>
+</blockquote>
+<ul>
+<li><strong>全局变量</strong></li>
+</ul>
+<blockquote>
+<p>在函数外声明的变量是<strong>全局</strong>变量</p>
+<p>网页上的所有脚本和函数都能访问它</p>
+<p><strong>生命周期</strong>：全局变量会在页面关闭后被删除 (生命期从它们被声明的时间开始)</p>
+</blockquote>
+<ul>
+<li>局部变量如果希望变为全局变量、可以使用<code>windows.var =</code>的形式赋予给当前窗口</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var x = 1;</span><br><span class="line">window.x = x;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function func(x,y)&#123;</span><br><span class="line">    return x + y</span><br><span class="line">&#125;</span><br><span class="line">var res = func(1,2)</span><br><span class="line">alert(res)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">JavaScript</span><br></pre></td></tr></table></figure>
+
+<p>函数解析过程：</p>
+<ol>
+<li><strong>预编译</strong>：<code>function</code>函数提前，并将<code>var</code>定义的变量声明提前，先暂时赋值为<code>undefined</code></li>
+<li><strong>执行</strong></li>
+</ol>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">func() // 弹出提示</span><br><span class="line">alert(iNum) // undefined</span><br><span class="line">alert(abc) // 出错</span><br><span class="line">function func() &#123;</span><br><span class="line">    alert(&quot;这个是函数&quot;)</span><br><span class="line">&#125;</span><br><span class="line">var iNum = 1</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="匿名函数"><a href="#匿名函数" class="headerlink" title="匿名函数"></a>匿名函数</h4><ul>
+<li>函数可以没有名字，比如直接为某些事件赋值</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">window.onload = function()&#123;</span><br><span class="line">	var sDate = new Date()</span><br><span class="line">	console.log(sDate)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="封闭函数"><a href="#封闭函数" class="headerlink" title="封闭函数"></a>封闭函数</h4><ul>
+<li>封闭函数常用来创建一个开始就执行而不用命名的函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(function()&#123;</span><br><span class="line">    alert(&quot;你好&quot;);</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>也可以在函数定义前加上”<code>~</code>“和”<code>!</code>“等符号来定义匿名函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">!function()&#123;</span><br><span class="line">    alert(&quot;你好&quot;);</span><br><span class="line">&#125;();</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>封闭函数可以创建一个独立的空间，在封闭函数内定义的变量不会影响外部同名的函数和变量，可以避免命名冲突</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var x = 1;</span><br><span class="line">!function()&#123;</span><br><span class="line">	var x = &quot;这是同名变量&quot;;</span><br><span class="line">    alert(x);</span><br><span class="line">&#125;</span><br><span class="line">alert(x);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当页面上引入多个<code>js</code>文件时，用这种办法比较安全</p>
+</blockquote>
+<hr>
+<h3 id="运算"><a href="#运算" class="headerlink" title="运算"></a>运算</h3><h4 id="算术运算符"><a href="#算术运算符" class="headerlink" title="算术运算符"></a>算术运算符</h4><table>
+<thead>
+<tr>
+<th align="left">运算符</th>
+<th align="left">描述</th>
+<th align="left">示例</th>
+<th align="left">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>+</code></td>
+<td align="left">加</td>
+<td align="left"><code>x=y+2</code></td>
+<td align="left"><code>x=7</code></td>
+</tr>
+<tr>
+<td align="left"><code>-</code></td>
+<td align="left">减</td>
+<td align="left"><code>x=y-2</code></td>
+<td align="left"><code>x=3</code></td>
+</tr>
+<tr>
+<td align="left"><code>*</code></td>
+<td align="left">乘</td>
+<td align="left"><code>x=y*2</code></td>
+<td align="left"><code>x=10</code></td>
+</tr>
+<tr>
+<td align="left"><code>/</code></td>
+<td align="left">除</td>
+<td align="left"><code>x=y/2</code></td>
+<td align="left"><code>x=2.5</code></td>
+</tr>
+<tr>
+<td align="left"><code>%</code></td>
+<td align="left">取余</td>
+<td align="left"><code>x=y%2</code></td>
+<td align="left"><code>x=1</code></td>
+</tr>
+<tr>
+<td align="left"><code>++</code></td>
+<td align="left">累加</td>
+<td align="left"><code>x=++y</code></td>
+<td align="left"><code>x=6</code></td>
+</tr>
+<tr>
+<td align="left"><code>--</code></td>
+<td align="left">递减</td>
+<td align="left"><code>x=--y</code></td>
+<td align="left"><code>x=4</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="赋值运算符"><a href="#赋值运算符" class="headerlink" title="赋值运算符"></a>赋值运算符</h4><table>
+<thead>
+<tr>
+<th align="left">运算符</th>
+<th align="left">例子</th>
+<th align="left">等价于</th>
+<th align="left">结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>=</code></td>
+<td align="left"><code>x=y</code></td>
+<td align="left"></td>
+<td align="left"><code>x=5</code></td>
+</tr>
+<tr>
+<td align="left"><code>+=</code></td>
+<td align="left"><code>x+=y</code></td>
+<td align="left"><code>x=x+y</code></td>
+<td align="left"><code>x=15</code></td>
+</tr>
+<tr>
+<td align="left"><code>-=</code></td>
+<td align="left"><code>x-=y</code></td>
+<td align="left"><code>x=x-y</code></td>
+<td align="left"><code>x=5</code></td>
+</tr>
+<tr>
+<td align="left"><code>*=</code></td>
+<td align="left"><code>x*=y</code></td>
+<td align="left"><code>x=x*y</code></td>
+<td align="left"><code>x=50</code></td>
+</tr>
+<tr>
+<td align="left"><code>/=</code></td>
+<td align="left"><code>x/=y</code></td>
+<td align="left"><code>x=x/y</code></td>
+<td align="left"><code>x=2</code></td>
+</tr>
+<tr>
+<td align="left"><code>%=</code></td>
+<td align="left"><code>x%=y</code></td>
+<td align="left"><code>x=x%y</code></td>
+<td align="left"><code>x=0</code></td>
+</tr>
+</tbody></table>
+<ul>
+<li><strong>注意</strong>：<strong>数字与字符串相加，结果将成为字符串</strong></li>
+</ul>
+<hr>
+<h4 id="比较运算符"><a href="#比较运算符" class="headerlink" title="比较运算符"></a>比较运算符</h4><table>
+<thead>
+<tr>
+<th align="left">运算符</th>
+<th align="left">描述</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>==</code></td>
+<td align="left">等于</td>
+<td align="left"><code>x==8</code>为<code>false</code></td>
+</tr>
+<tr>
+<td align="left"><code>===</code></td>
+<td align="left">全等（值和类型）</td>
+<td align="left"><code>x===5</code>为<code>true</code>；<code>x===&quot;5&quot;</code>为<code>false</code></td>
+</tr>
+<tr>
+<td align="left"><code>!=</code></td>
+<td align="left">不等于</td>
+<td align="left"><code>x!=8</code>为<code>true</code></td>
+</tr>
+<tr>
+<td align="left"><code>&gt;</code></td>
+<td align="left">大于</td>
+<td align="left"><code>x&gt;8</code>为<code>false</code></td>
+</tr>
+<tr>
+<td align="left"><code>&lt;</code></td>
+<td align="left">小于</td>
+<td align="left"><code>x&lt;8</code>为<code>true</code></td>
+</tr>
+<tr>
+<td align="left"><code>&gt;=</code></td>
+<td align="left">大于或等于</td>
+<td align="left"><code>x&gt;=8</code>为<code>false</code></td>
+</tr>
+<tr>
+<td align="left"><code>&lt;=</code></td>
+<td align="left">小于或等于</td>
+<td align="left"><code>x&lt;=8</code>为<code>true</code></td>
+</tr>
+</tbody></table>
+<ul>
+<li>比较运算符常在条件语句中进行使用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var name = &quot;张三&quot;;</span><br><span class="line"> 	if (name==&quot;张三&quot;) &#123;</span><br><span class="line"> 		document.write(&quot;这个人是张三&quot;)</span><br><span class="line"> 	&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="逻辑运算符"><a href="#逻辑运算符" class="headerlink" title="逻辑运算符"></a>逻辑运算符</h4><table>
+<thead>
+<tr>
+<th align="left">运算符</th>
+<th align="left">描述</th>
+<th align="left">示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>&amp;&amp;</code></td>
+<td align="left"><code>and</code></td>
+<td align="left"><code>(x &lt; 10 &amp;&amp; y &gt; 1)</code> 为 <code>true</code></td>
+</tr>
+<tr>
+<td align="left">`</td>
+<td align="left"></td>
+<td align="left">`</td>
+</tr>
+<tr>
+<td align="left"><code>!</code></td>
+<td align="left"><code>not</code></td>
+<td align="left"><code>!(x==y)</code> 为 <code>true</code></td>
+</tr>
+</tbody></table>
+<h4 id="条件运算符"><a href="#条件运算符" class="headerlink" title="条件运算符"></a>条件运算符</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var NumCheck = 0; </span><br><span class="line">var Dis = (NumCheck==0) ? &quot;是数字0&quot;:&quot;不是数字0&quot;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如果变量<code>NumCheck</code>是<code>0</code>，则<code>Dis</code>的值为：”是数字<code>0</code>“；反之为：”不是数字<code>0</code>“</li>
+</ul>
+<hr>
+<h3 id="条件语句"><a href="#条件语句" class="headerlink" title="条件语句"></a>条件语句</h3><ul>
+<li>条件语句</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var iNum = 0;</span><br><span class="line">if (iNum==0)&#123;</span><br><span class="line">    ...;</span><br><span class="line">&#125;else if (iNum==1) &#123;</span><br><span class="line">   	条件细分...;</span><br><span class="line">&#125;else&#123;</span><br><span class="line">	不满足以上条件均到这里;   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>switch</code>语句</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var day = new Date().getDay();</span><br><span class="line">// 星期日:0  范围:0~6</span><br><span class="line">switch(day)&#123;</span><br><span class="line">	case 0:</span><br><span class="line">		alert(&quot;今天是星期二&quot;);</span><br><span class="line">		break;</span><br><span class="line">	case 1:</span><br><span class="line">		...</span><br><span class="line">		break;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>工作原理</strong>：首先设置表达式<code>n</code>（通常是一个变量）；随后表达式的值会与结构中的每个<code>case</code>的值做比较。如果存在匹配，则与该<code>case</code>关联的代码块会被执行。请使用<em>break</em>来阻止代码自动地向下一个<code>case</code>运行</li>
+</ul>
+<hr>
+<h3 id="for循环语句"><a href="#for循环语句" class="headerlink" title="for循环语句"></a>for循环语句</h3><ul>
+<li><strong>语法</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">for(var i = 0; i &lt; len; i++)&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">// for(起点数据; 判断条件; 数据递增或递减)&#123;&#125;</span><br><span class="line">var i = 0;</span><br><span class="line">for( ;i &lt; 10; i++)&#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line">// 如果循环起始值已经被设置，可以在开头省略</span><br><span class="line">for(var i = 0; ; i++)&#123;</span><br><span class="line">    ...</span><br><span class="line">    if (i==5)&#123;</span><br><span class="line">        ...</span><br><span class="line">        break; //终止循环</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">// 当没有第二个语句时，必须在循环内提供break，否则循环则无法停下来，可能令浏览器崩溃</span><br><span class="line">for(var i = 0; i &lt; 10; )&#123;</span><br><span class="line">   	console.log(i);</span><br><span class="line">    i += 2;</span><br><span class="line">&#125;</span><br><span class="line">// 如果没有提供第三个语句，可以在for循环中进行编写数值的变化</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>for/in</code>语句循环遍历对象的属性</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">for (x in object)&#123;</span><br><span class="line">    console.log(x);</span><br><span class="line">&#125;</span><br><span class="line">// 字符串：x 取下标</span><br><span class="line">// 数组：x 取下标</span><br><span class="line">// 对象：x 取key</span><br><span class="line">var x = &quot;abcdef&quot;  // 0,1,2,3,4,5</span><br><span class="line">var y = [1,2,3,4,&quot;5&quot;] // 0,1,2,3,4</span><br><span class="line">var z = &#123; //  name,age,gender</span><br><span class="line">    name:&quot;张三&quot;,</span><br><span class="line">    age:16,</span><br><span class="line">    gender:&quot;male&quot;,</span><br><span class="line">&#125;</span><br><span class="line">for (obj in z)&#123;</span><br><span class="line">    console.log(obj);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="while循环语句"><a href="#while循环语句" class="headerlink" title="while循环语句"></a>while循环语句</h3><ul>
+<li>语法</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">while (条件)&#123;</span><br><span class="line">    执行代码;</span><br><span class="line">&#125;</span><br><span class="line">var x = &quot;abcdef&quot;;</span><br><span class="line">var i = 0;</span><br><span class="line">while (x[i])&#123;</span><br><span class="line">    console.log(x[i]);</span><br><span class="line">    i++;</span><br><span class="line">&#125;</span><br><span class="line">// 下表超出范围时不会报错，返回undefined</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>do/while</code>循环：<code>do/while</code>循环是<code>while</code>循环的变体</li>
+</ul>
+<blockquote>
+<p>该循环首先会执行一次循环代码块，然后检查循环条件是否为真</p>
+<p>如果条件为真，就会重复这个循环</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">do&#123;</span><br><span class="line">	循环执行代码</span><br><span class="line">&#125;while (条件);</span><br><span class="line">var i = 3;</span><br><span class="line">do&#123;</span><br><span class="line">    console.log(i)</span><br><span class="line">    i--;</span><br><span class="line">&#125;while (i &gt; 5);</span><br><span class="line">// do/while循环至少会执行一次</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="获取页面元素"><a href="#获取页面元素" class="headerlink" title="获取页面元素"></a>获取页面元素</h3><ul>
+<li>通过页面元素<code>ID</code>值进行获取：<code>document.getElementById(&#39;&#39;)</code><ul>
+<li>获取到的是一个<code>HTML</code>对象，可以赋值给一个变量</li>
+</ul>
+</li>
+<li><strong>注意</strong>：获取对应元素时，首先要确定页面已经生成所需元素</li>
+</ul>
+<blockquote>
+<p>通常我们将<code>javascript</code>代码写到页面最下面</p>
+<p>或通过使用<code>windows.onload()</code>事件判断是否已经生成页面</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">	&lt;p id=&quot;p&quot;&gt;这是一段待获取的文字&lt;/p&gt;</span><br><span class="line">	&lt;script&gt;</span><br><span class="line">		function func()&#123;</span><br><span class="line">			var sP = document.getElementById(&apos;p&apos;);</span><br><span class="line">			console.log(sP);</span><br><span class="line">		&#125;</span><br><span class="line">		func()</span><br><span class="line">	&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;!-- 获取到的内容: &lt;p id=&quot;p&quot;&gt;这是一段待获取的文字&lt;/p&gt; --&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">	&lt;p id=&quot;p&quot;&gt;这是一段待获取的文字&lt;/p&gt;</span><br><span class="line">	&lt;script&gt;</span><br><span class="line">		window.onload = function()&#123;</span><br><span class="line">			var sP = document.getElementById(&apos;p&apos;);</span><br><span class="line">			console.log(sP);</span><br><span class="line">		&#125;</span><br><span class="line">	&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;!-- 获取到的内容: &lt;p id=&quot;p&quot;&gt;这是一段待获取的文字&lt;/p&gt; --&gt;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="操作页面元素"><a href="#操作页面元素" class="headerlink" title="操作页面元素"></a>操作页面元素</h3><ul>
+<li>可以通过<code>id</code>方式获取到对应页面内的元素，就可以对元素的属性进行操作，包括对属性的读和写</li>
+<li>读取元素属性：元素<code>.</code>属性</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;p id=&quot;aaa&quot; style=&quot;color: red;&quot;&gt;这是一段待获取的文字&lt;/p&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    var oP = document.getElementById(&apos;aaa&apos;);</span><br><span class="line">    console.log(oP)</span><br><span class="line">    console.log(oP.id);</span><br><span class="line">    console.log(oP.style);</span><br><span class="line">    console.log(oP.style.color);</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>修改元素属性：元素.属性 =<code>xxx</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;p id=&quot;aaa&quot; style=&quot;color: red;&quot;&gt;这是一段待获取的文字&lt;/p&gt;</span><br><span class="line">&lt;button onclick=&quot;blue_font()&quot;&gt;按钮&lt;/button&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">    function blue_font()&#123;</span><br><span class="line">        var oP = document.getElementById(&apos;aaa&apos;);</span><br><span class="line">        oP.style.color = &quot;blue&quot;;</span><br><span class="line">        // 修改字体样式属性中的字体颜色为蓝色</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;p id=&quot;aaa&quot; style=&quot;color: red;&quot;&gt;这是一段待获取的文字&lt;/p&gt;</span><br><span class="line">&lt;button id=&quot;color_button&quot;&gt;按钮&lt;/button&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">    color_button.onclick = function()&#123;</span><br><span class="line">        var oP = document.getElementById(&apos;aaa&apos;);</span><br><span class="line">        oP.style.color = &quot;blue&quot;;</span><br><span class="line">        // 修改字体样式属性中的字体颜色为蓝色</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>也可以获取到对应按钮元素后在绑定函数到它</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;p id=&quot;aaa&quot; style=&quot;color: red;&quot;&gt;这是一段待获取的文字&lt;/p&gt;</span><br><span class="line">&lt;button id=&quot;Button&quot;&gt;按钮&lt;/button&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    var oButton = document.getElementById(&apos;Button&apos;);</span><br><span class="line">    oButton.onclick = function()&#123;</span><br><span class="line">        var oP = document.getElementById(&apos;aaa&apos;);</span><br><span class="line">        oP.style.color = &quot;blue&quot;;</span><br><span class="line">        // 修改字体样式属性中的字体颜色为蓝色</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>读取或写入标签包裹的内容（读取或修改标签文本内容）：<code>innerHTML</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;a id=&quot;a&quot; href=&quot;https://www.baidu.com&quot;&gt;百度&lt;/a&gt;</span><br><span class="line">&lt;button onclick=&quot;urlChange()&quot;&gt;变搜狗&lt;/button&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    function urlChange()&#123;</span><br><span class="line">        var oA = document.getElementById(&apos;a&apos;);</span><br><span class="line">        oA.href = &quot;https://www.sougou.com&quot;;</span><br><span class="line">        console.log(oA.innerHTML); // 获取标签文本内容</span><br><span class="line">        oA.innerHTML = &quot;搜狗&quot;; //修改标签文本内容</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="JS事件及属性"><a href="#JS事件及属性" class="headerlink" title="JS事件及属性"></a>JS事件及属性</h3><ul>
+<li>常见事件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- 用户点击鼠标</span><br><span class="line">- 网页已加载</span><br><span class="line">- 图像已加载</span><br><span class="line">- 鼠标移动某个元素上</span><br><span class="line">- 输入字段被改变时</span><br><span class="line">- 提交表单时</span><br><span class="line">- 用户触发某些按键时</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>onclick</code>事件：用户点击鼠标</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;p onclick=&quot;TextChange(this)&quot;&gt;这是文本&lt;/p&gt;</span><br><span class="line">&lt;!-- this 代表当前所处的元素 --&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">    function TextChange(id)&#123;</span><br><span class="line">        id.innerHTML = &quot;文本修改&quot;//可以直接通过传来的参数进行页面元素的读取及修改</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br><span class="line">&lt;p id=&quot;p&quot;&gt;这是文本&lt;/p&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">    var oP = document.getElementById(&quot;p&quot;);</span><br><span class="line">    oP.onclick = function()&#123;</span><br><span class="line">        oP.innerHTML = &quot;文本修改&quot;//可以直接通过传来的参数进行页面元素的读取及修改</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>onmouseover</code>事件：鼠标移入</li>
+<li><code>onmouseout</code>事件：鼠标移出</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;p id=&quot;aaa&quot;&gt;请把鼠标移动过来&lt;/p&gt;</span><br><span class="line">&lt;script&gt;</span><br><span class="line">    var oP = document.getElementById(&quot;aaa&quot;);</span><br><span class="line">    oP.onmouseover = function()&#123;</span><br><span class="line">        oP.style.color = &quot;green&quot;;//可以直接通过传来的参数进行页面元素的读取及修改</span><br><span class="line">    &#125;</span><br><span class="line">    oP.onmouseout = function()&#123;</span><br><span class="line">        oP.style.color = &quot;red&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="JS高级"><a href="#JS高级" class="headerlink" title="JS高级"></a>JS高级</h2><h3 id="字符串及操作方法"><a href="#字符串及操作方法" class="headerlink" title="字符串及操作方法"></a>字符串及操作方法</h3><ul>
+<li>字符串合并：<code>+</code></li>
+<li>数字字符串变整数：<code>parseInt()</code></li>
+<li>数字字符串变浮点数：<code>parseFloat()</code></li>
+<li>字符串按分隔符切分：<code>split(&quot;*&quot;)</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var x = &quot;a*b*c*d&quot;</span><br><span class="line">alert(x.split(&quot;*&quot;)) // a,b,c,d</span><br><span class="line">console.log(x.split(&quot;*&quot;)) // [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查找字符串是否含有某字符，找到返回索引，找不到返回-1：<code>String.indexOf()</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var x = &quot;abcdefag&quot;</span><br><span class="line">var res = x.indexOf(&quot;z&quot;)</span><br><span class="line">alert(res)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>截取字符串：<code>String.substring(start, end)</code>，不包含end索引位置数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var x = &quot;abcdefag&quot;</span><br><span class="line">alert(x.substring(2)) // cdefag</span><br><span class="line">alert(x.substring(2,4)) // cd</span><br><span class="line">alert(x.substring()) // abcdefag</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>字符串反转：通过结合数组的<code>reverse()</code>函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var x = &quot;abcd&quot;;</span><br><span class="line">console.log(x.split(&quot;&quot;).reverse().join(&quot;&quot;)) //dcba</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="数组及操作方法"><a href="#数组及操作方法" class="headerlink" title="数组及操作方法"></a>数组及操作方法</h3><ul>
+<li>定义数组的方法</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var aList = new Array(1,2,3);</span><br><span class="line">var aList = new Array();</span><br><span class="line">aList[0] = &quot;a&quot;;</span><br><span class="line">aList[1] = &quot;b&quot;;</span><br><span class="line">var aList = [1,2,3,4,&quot;a&quot;];</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>获取数组的长度：<code>Array.length()</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var aList = new Array(1,2,3);</span><br><span class="line">console.log(aList.length) // 3</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>将数组成员通过指定拼接符合并成一个字符串：<code>Array.join(&quot;*&quot;)</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var aList = [1,2,3,4,5]</span><br><span class="line">console.log(aList.join(&quot;*&quot;)) // 1*2*3*4*5</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>向数组的<strong>最后</strong>增加或删除成员：<code>Array.pop()</code>、<code>Array.push()</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var aList = [1,2,3,4,5]</span><br><span class="line">var opa = aList.pop() // opa: 5</span><br><span class="line">console.log(opa) // 5</span><br><span class="line">console.log(aList) // [1, 2, 3, 4]</span><br><span class="line">aList.push(&quot;a&quot;)</span><br><span class="line">console.log(aList) // [1, 2, 3, 4, &quot;a&quot;]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>将数组反转：<code>Array.reverse()</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var aList = [1,2,3,4,5];</span><br><span class="line">aList.reverse();</span><br><span class="line">console.log(aList); //[5, 4, 3, 2, 1]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>返回数组中元素第一次出现的索引值：<code>Array.indexOf(chr)</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var aList = [1,2,3,4,5];</span><br><span class="line">console.log(aList.indexOf(3)) // 2</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在数组中增加或删除成员，并返回被删除的：<code>Array.splice(index, howmany, items...)</code></li>
+</ul>
+<blockquote>
+<p>从<code>index</code>位置开始，给定的<code>hwomany</code>个数的值，并用后面的<code>items</code>替换这些被<strong>删除</strong>的值</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var aList = [1,2,&quot;a&quot;,4,5]</span><br><span class="line">aList.splice(2,1,&quot;b&quot;,&quot;c&quot;)</span><br><span class="line">console.log(aList) // [1, 2, &quot;b&quot;, &quot;c&quot;, 4, 5]</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="多维数组"><a href="#多维数组" class="headerlink" title="多维数组"></a>多维数组</h4><blockquote>
+<p>数组的成员包含数组</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">var aList = [1,2,3,[&quot;a&quot;,&quot;b&quot;]]</span><br><span class="line">console.log(aList[-1][0]) // 出错 undefined</span><br><span class="line">console.log(aList[3][0]) // a</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="定时器"><a href="#定时器" class="headerlink" title="定时器"></a>定时器</h3><ul>
+<li>作用：定时调用函数、制作动画</li>
+</ul>
+<hr>
+<h4 id="反复执行定时器"><a href="#反复执行定时器" class="headerlink" title="反复执行定时器"></a>反复执行定时器</h4><ul>
+<li><code>setInterval(code, millisec)</code>：反复执行的定时器</li>
+<li><code>code</code>: 必须参数，要调用的函数或要执行的代码串<ul>
+<li><code>millisec</code>: 必须参数，执行<code>code</code>任务所需要的事件间隔，以毫秒计</li>
+</ul>
+</li>
+<li><code>clearInterval(setInterval_obj)</code>：<strong>关闭</strong>反复执行的定时器</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--跑马灯效果--&gt;</span><br><span class="line">&lt;h3 id=&quot;h3&quot;&gt;abcdefg&lt;/h3&gt;</span><br><span class="line">&lt;button id=&quot;start_button&quot;&gt;开始&lt;/button&gt;</span><br><span class="line">&lt;button id=&quot;stop_button&quot;&gt;停止&lt;/button&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">    start_button.onclick = function()&#123; // 开启定时事件</span><br><span class="line">    	var sT = setInterval(loop,1000);</span><br><span class="line">    	window.sT = sT; // 声明此sT定时事件为全局变量</span><br><span class="line">	&#125;</span><br><span class="line">    stop_button.onclick = function()&#123; // 关闭定时事件</span><br><span class="line">        clearInterval(sT)</span><br><span class="line">    &#125;</span><br><span class="line">    function loop()&#123;</span><br><span class="line">        var Opstr = document.getElementById(&apos;h3&apos;);</span><br><span class="line">        Opstr.innerHTML = Opstr.innerHTML.substring(1) + Opstr.innerHTML[0]</span><br><span class="line">        console.log(Opstr.innerHTML)</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="等待执行定时器"><a href="#等待执行定时器" class="headerlink" title="等待执行定时器"></a>等待执行定时器</h4><ul>
+<li><p><code>setTimeout(code, millisec)</code>：定义只执行一次的等待定时器</p>
+</li>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">code</span><br></pre></td></tr></table></figure>
+
+<p>: 必须参数，要调用的函数或要执行的代码串</p>
+<ul>
+<li><code>millisec</code>: 必须参数，执行<code>code</code>任务所需要的事件间隔，以毫秒计</li>
+</ul>
+</li>
+<li><p><code>clearTimeout(setTimeout_obj)</code>：关闭只执行一次的等待计时器</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;h3 id=&quot;h3&quot;&gt;我是一个内容&lt;/h3&gt;</span><br><span class="line">&lt;button id=&quot;start_button&quot;&gt;让上面的内容消失&lt;/button&gt;</span><br><span class="line">&lt;script type=&quot;text/javascript&quot;&gt;</span><br><span class="line">    start_button.onclick = function()&#123;</span><br><span class="line">        var st = setTimeout(clear,1000)</span><br><span class="line">        window.st = st;</span><br><span class="line">    &#125;</span><br><span class="line">    function clear()&#123;</span><br><span class="line">        var oH3 = document.getElementById(&apos;h3&apos;);</span><br><span class="line">        oH3.innerHTML = &quot;&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xiao Zhuang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaozhuang.tech/2017/09/15/javascript/" title="Paramiko">http://xiaozhuang.tech/2017/09/15/javascript/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <div>
+        
+          <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+        
+      </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/javaScript/" rel="tag"># javaScript</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2018/09/15/远程连接/" rel="prev" title="Paramiko">
+                  Paramiko <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JavaScript"><span class="nav-text">JavaScript</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JavaScript引入"><span class="nav-text">JavaScript引入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#变量定义"><span class="nav-text">变量定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基本数据类型"><span class="nav-text">基本数据类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类型转换"><span class="nav-text">类型转换</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#强制类型转换"><span class="nav-text">强制类型转换</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复合类型"><span class="nav-text">复合类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#函数"><span class="nav-text">函数</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#变量作用域"><span class="nav-text">变量作用域</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#匿名函数"><span class="nav-text">匿名函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#封闭函数"><span class="nav-text">封闭函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#运算"><span class="nav-text">运算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#算术运算符"><span class="nav-text">算术运算符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#赋值运算符"><span class="nav-text">赋值运算符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#比较运算符"><span class="nav-text">比较运算符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#逻辑运算符"><span class="nav-text">逻辑运算符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#条件运算符"><span class="nav-text">条件运算符</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#条件语句"><span class="nav-text">条件语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#for循环语句"><span class="nav-text">for循环语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#while循环语句"><span class="nav-text">while循环语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取页面元素"><span class="nav-text">获取页面元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#操作页面元素"><span class="nav-text">操作页面元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JS事件及属性"><span class="nav-text">JS事件及属性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JS高级"><span class="nav-text">JS高级</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串及操作方法"><span class="nav-text">字符串及操作方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数组及操作方法"><span class="nav-text">数组及操作方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#多维数组"><span class="nav-text">多维数组</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定时器"><span class="nav-text">定时器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#反复执行定时器"><span class="nav-text">反复执行定时器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#等待执行定时器"><span class="nav-text">等待执行定时器</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Xiao Zhuang"
+    src="/images/cao.jpg">
+  <p class="site-author-name" itemprop="name">Xiao Zhuang</p>
+  <div class="site-description" itemprop="description">记录生活点点滴滴</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" title="GitHub &rarr; https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1624611910@qq.com" title="E-Mail &rarr; mailto:1624611910@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘国壮</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,0' opacity='0.5' zIndex='-1' count='150' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.2"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
