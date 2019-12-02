@@ -215,6 +215,183 @@
       </tags>
   </entry>
   <entry>
+    <title>Paramiko</title>
+    <url>/2018/02/15/Paramiko/</url>
+    <content><![CDATA[<h2 id="Paramiko"><a href="#Paramiko" class="headerlink" title="Paramiko"></a>Paramiko</h2><blockquote>
+<p><code>Paramiko</code>是<code>SSHv2</code>协议的<code>Python</code>实现，提供客户端和服务器功能</p>
+<p><code>Paramiko</code>本身是一个围绕<code>SSH</code>网络概念的纯<code>Python</code>接口</p>
+<p>利用<code>paramiko</code>我们可以通过<code>Python</code>方便的进行<code>ssh</code>操作</p>
+</blockquote><a id="more"></a>
+<hr>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt; paramiko`包含两个核心组件：`SSHClient`和`SFTPClient</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h3 id="SSHClient"><a href="#SSHClient" class="headerlink" title="SSHClient"></a>SSHClient</h3><blockquote>
+<p><code>SSHClient</code>的作用类似于<code>Linux</code>的<code>ssh</code>命令，是对<code>SSH</code>会话的封装</p>
+<p>该类封装了传输<code>Transport</code>，通道<code>Channel</code>及<code>SFTPClient</code>建立的方法<code>open_sftp</code>，通常用于执行远程命令</p>
+</blockquote>
+<h4 id="API"><a href="#API" class="headerlink" title="API"></a>API</h4><ul>
+<li><code>class paramiko.client.SSHClient</code></li>
+</ul>
+<blockquote>
+<p>创建<code>SSH</code>客户端实例</p>
+</blockquote>
+<ul>
+<li><code>SSHClient.connect(hostname, port=22, username=None, password=None, pkey=None, key_filename=None, timeout=None, allow_agent=True, look_for_keys=True, compress=False..)</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 参数解释</span><br><span class="line">- hostname：连接的目标主机</span><br><span class="line">- port=SSH_PORT：指定端口</span><br><span class="line">- username=None：验证的用户名</span><br><span class="line">- password=None：验证的用户密码</span><br><span class="line">- pkey=None：私钥方式用于身份验证</span><br><span class="line">- key_filename=None：一个文件名或文件列表，指定私钥文件</span><br><span class="line">- timeout=None：可选的tcp连接超时时间</span><br><span class="line">- allow_agent=True：是否允许连接到ssh代理，默认为True 允许</span><br><span class="line">- look_for_keys=True：是否在~/.ssh中搜索私钥文件，默认为True 允许</span><br><span class="line">- compress=False：是否打开压缩</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>通过验证连接远程服务端</p>
+</blockquote>
+<hr>
+<ul>
+<li><code>SSHClient.exec_command(command, bufsize=-1, timeout=None, get_pty=False, environment=None)</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 参数解释</span><br><span class="line">- command：要执行的命令</span><br><span class="line">- bufsize：与Python中文件对象的同名函数解释相同，缓冲区大小</span><br><span class="line">- timeout：设置命令的超时相应事件</span><br><span class="line">- get_pty：从服务器请求一个伪终端（默认为假）</span><br><span class="line">- environment：一个当前shell环境的字典，远程命令的默认执行环境</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>command</code>参数为要执行的<code>shell</code>命令，打开一个新通道并执行请求的命令</p>
+<p>该函数的返回结果为一个元组，其中包含<code>stdin</code>、<code>stdout</code>和<code>stderr</code>，也就是我们常见的标准输入，输出以及出错</p>
+<p>一般来说，命令的结果我们将通过<code>stdout</code>进行获取</p>
+</blockquote>
+<hr>
+<ul>
+<li><code>SSHClient.close()</code></li>
+</ul>
+<blockquote>
+<p>关闭<code>SSH</code>连接</p>
+</blockquote>
+<hr>
+<ul>
+<li><code>SSHClient.invoke_shell(term=’vt100’, width=80, height=24, width_pixels=0, height_pixels=0, environment=None)</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 参数解释</span><br><span class="line">- term：模拟终端类型</span><br><span class="line">- width：终端长度</span><br><span class="line">- height：终端宽度</span><br><span class="line">- width_pixels：终端的像素宽度</span><br><span class="line">- height_pixels：终端的像素高度</span><br><span class="line">- environment：命令的shell环境</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在<code>ssh</code>服务器上启动交互式<code>shell</code>会话</p>
+<p>一个新的通道被打开并连接到，使用请求的终端类型和大小的伪终端，并作为返回值</p>
+<p>换句通俗的话来讲，就是创建了一个实际的<code>shell</code>窗口空间进行命令交互</p>
+</blockquote>
+<hr>
+<ul>
+<li><code>SSHClient.set_missing_host_key_policy(policy)</code></li>
+</ul>
+<blockquote>
+<p>设置连接到没有已知主机密钥的服务器时要使用的策略</p>
+<p>常见使用策略为<code>paramiko.client.AutoAddPolicy</code>，其意义为自动将主机名和新主机密钥添加到本地主机密钥对象并保存</p>
+</blockquote>
+<h4 id="实例代码"><a href="#实例代码" class="headerlink" title="实例代码"></a>实例代码</h4><blockquote>
+<p>以下是一个简单的通过<code>SSHClient</code>建立的通道进行命令的传输与返回结果的获取的代码！</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import paramiko </span><br><span class="line"></span><br><span class="line">def connect(hostname,username,password):</span><br><span class="line">	client = paramiko.SSHClient() </span><br><span class="line">    # 初始化</span><br><span class="line">	client.set_missing_host_key_policy(paramiko.AutoAddPolicy())</span><br><span class="line">    # 设置密钥策略</span><br><span class="line">	client.connect(hostname,username=username,password=password)</span><br><span class="line">    # 连接主机</span><br><span class="line">	return client</span><br><span class="line"></span><br><span class="line">def exec_cmd(client,cmd):</span><br><span class="line">	stdin,stdout,stderr = client.exec_command(cmd)</span><br><span class="line">	return stdout.read().decode(),stderr.read().decode()</span><br><span class="line">def main():</span><br><span class="line">	hostname = &apos;192.168.0.104&apos;</span><br><span class="line">	username = &apos;pi&apos;</span><br><span class="line">	password = &apos;123456&apos;</span><br><span class="line">	cmd = &apos;ps -aux&apos;</span><br><span class="line"></span><br><span class="line">	client = connect(hostname,username,password)</span><br><span class="line">	res = exec_cmd(client, cmd)</span><br><span class="line">	if res[0]:</span><br><span class="line">		print(res[0])</span><br><span class="line">	if res[1]:</span><br><span class="line">		print(&apos;[E]:\n&apos;,res[1])</span><br><span class="line">	client.close()</span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">	main()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上面的代码通过默认建立好的连接对象进行命令的传输以及返回结果的获取</p>
+</blockquote>
+<h4 id="invoke-shell"><a href="#invoke-shell" class="headerlink" title="invoke_shell"></a>invoke_shell</h4><ul>
+<li>接下来使用<code>invoke_shell</code>进行虚拟终端的连接，首先初始化<code>SSH</code>通道</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">class SSHChannle:</span><br><span class="line">    def __init__(self, host, username, password, port=22):</span><br><span class="line">        &apos;&apos;&apos;</span><br><span class="line">            初始化SSH通道</span><br><span class="line">        &apos;&apos;&apos;</span><br><span class="line">        self.sh = paramiko.SSHClient()</span><br><span class="line">        self.sh.set_missing_host_key_policy(paramiko.AutoAddPolicy())</span><br><span class="line">        self.sh.connect(host, username=username, password=password)</span><br><span class="line">        self.channle = self.sh.invoke_shell()</span><br><span class="line">        self.cmd = &apos;&apos;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>思路为开启两个线程，分别负责命令的接收与命令的发送</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">def get_ssh_recv(self):</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">        接收SSH通道中发来的消息</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    while not self.channle.exit_status_ready():</span><br><span class="line">        # 如果远程进程已退出并返回退出状态，则返回true</span><br><span class="line">        time.sleep(0.1)</span><br><span class="line">        try:</span><br><span class="line">            buf = self.channle.recv(1024).decode(&apos;utf-8&apos;)</span><br><span class="line">            print(buf,end=&apos;&apos;)</span><br><span class="line">        except Exception as ex:</span><br><span class="line">            print(ex)</span><br><span class="line">        sys.stdout.flush()</span><br><span class="line">def send_ssh_cmd(self):</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">        发送命令给SSH通道</span><br><span class="line">    &apos;&apos;&apos;</span><br><span class="line">    while not self.channle.exit_status_ready():</span><br><span class="line">        self.cmd = input()</span><br><span class="line">        try:</span><br><span class="line">            self.channle.send(self.cmd + &apos;\r&apos;)</span><br><span class="line">        except Exception as ex:</span><br><span class="line">            print(ex)</span><br><span class="line">        # sys.stdin.flush()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在实例中定义<code>run</code>函数用来开启两个线程并负责线程的资源回收以及SSH通道的关闭</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">def run(self):</span><br><span class="line">    ssh_recv_thread = threading.Thread(target=self.get_ssh_recv)</span><br><span class="line">    ssh_send_thread = threading.Thread(target=self.send_ssh_cmd)</span><br><span class="line">    ssh_recv_thread.start()</span><br><span class="line">    ssh_send_thread.start()</span><br><span class="line"></span><br><span class="line">    ssh_recv_thread.join()</span><br><span class="line">    ssh_send_thread.join()</span><br><span class="line"></span><br><span class="line">    self.sh.close()  # 关闭通道</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在<code>win</code>下的<code>CMD</code>中查看效果，其中的乱码格式其实为连接后命令传输的特殊标记格式，可以在后面结合前端中类似<code>xterm.js</code>等插件查看到实际花里胡哨的效果</li>
+</ul>
+<p><a href="https://lienze.tech/blog/images/invoke_shell.gif" target="_blank" rel="noopener"><img src="https://lienze.tech/blog/images/invoke_shell.gif" alt="invoke_shell"></a></p>
+<h3 id="SFTPClient"><a href="#SFTPClient" class="headerlink" title="SFTPClient"></a>SFTPClient</h3><blockquote>
+<p><code>SFTPClient</code>的作用类似与<code>Linux</code>的<code>sftp</code>命令，是对<code>SFTP</code>客户端的封装</p>
+<p>用以实现远程文件操作，如文件上传、下载、修改文件权限等操作</p>
+</blockquote>
+<h4 id="API-1"><a href="#API-1" class="headerlink" title="API"></a>API</h4><ul>
+<li>官方文档</li>
+</ul>
+<blockquote>
+<p>docs.paramiko.org/en/2.4/api/sftp.html</p>
+</blockquote>
+<ul>
+<li><code>sftp=paramiko.SFTPClient.from_transport(t,window_size=None,max_packet_size=None)</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 参数解释</span><br><span class="line">- t：该参数可以通过paramiko.Transport( (ip,port ))，创建一个已通过验证的传输通道，参数为IP和端口的二元组</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>根据参数<code>t</code>指定的已验证传输通道进行<code>SFTP</code>客户端的创建</p>
+</blockquote>
+<ul>
+<li><code>sftp.put(localpath, remotepath, callback=None, confirm=True)</code></li>
+</ul>
+<blockquote>
+<p>上传本地路径为<code>localpath</code>的文件到目标主机<code>remotepath</code>处</p>
+</blockquote>
+<ul>
+<li><code>sftp.get(remotepath, localpath, callback=None)</code></li>
+</ul>
+<blockquote>
+<p>下载远程路径为<code>remotepath</code>路径的的文件到本地主机<code>localpath</code>处</p>
+</blockquote>
+<ul>
+<li><code>open(filename, mode=’r’, bufsize=-1)</code></li>
+</ul>
+<blockquote>
+<p>打开位于远程主机上的文件，与<code>open</code>函数类似，返回文件对象</p>
+</blockquote>
+<ul>
+<li><code>listdir(path=&#39;.&#39;)</code></li>
+</ul>
+<blockquote>
+<p>返回给定路径下文件及目录的列表，默认路径为当前工作目录</p>
+</blockquote>
+<ul>
+<li><code>chdir(path=None)</code></li>
+</ul>
+<blockquote>
+<p>修改当前<code>SFTP</code>连接会话的工作目录</p>
+</blockquote>
+<ul>
+<li><code>lstat(path)</code></li>
+</ul>
+<blockquote>
+<p>检索当前<code>path</code>所指向的文件信息</p>
+</blockquote>
+<ul>
+<li><code>mkdir(path,mode=511)</code></li>
+</ul>
+<blockquote>
+<p>根据<code>path</code>在目标主机创建默认权限为<code>511</code>的目录</p>
+</blockquote>
+<ul>
+<li><code>rmdir(path)</code></li>
+</ul>
+<blockquote>
+<p>删除给定<code>path</code>所指向的目录</p>
+</blockquote>
+<ul>
+<li><code>remove(path)</code></li>
+</ul>
+<blockquote>
+<p>删除给定<code>path</code>所指向的文件</p>
+</blockquote>
+<h4 id="实例代码-1"><a href="#实例代码-1" class="headerlink" title="实例代码"></a>实例代码</h4><blockquote>
+<p>以下是一个比较简陋的关于<code>SFTPClient</code>的测试代码</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import paramiko</span><br><span class="line">def connecnt(hostname,username,password): #创建连接对象</span><br><span class="line">    client = paramiko.Transport( (hostname,22))</span><br><span class="line">    try:</span><br><span class="line">        client.connect(username=username,password=password)</span><br><span class="line">    except paramiko.SSHException:</span><br><span class="line">        return None</span><br><span class="line">    sftp_client = paramiko.SFTPClient.from_transport(client)</span><br><span class="line">    return sftp_client</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    hostname = &apos;192.168.0.104&apos;</span><br><span class="line">    username = &apos;pi&apos;</span><br><span class="line">    password = &apos;123456&apos;</span><br><span class="line">    sftp_client = connecnt(hostname,username,password)</span><br><span class="line">    remotefile_path = &apos;/home/pi/test&apos; # 目标主机文件路径</span><br><span class="line">    localfile_path = &apos;/home/test&apos; # 本地主机文件路径</span><br><span class="line"></span><br><span class="line">    sftp_client.put(localfile_path, remotefile_path) #上传本地test文件到远程</span><br><span class="line">    sftp_client.get(remotefile_path, localfile_path) #下载远程test文件到本地</span><br><span class="line">    print(sftp_client.listdir())</span><br><span class="line">    print(&apos;--------------------&apos;)</span><br><span class="line">    print(sftp_client.lstat(remotefile_path))</span><br><span class="line">    print(&apos;--------------------&apos;)</span><br><span class="line">    with sftp_client.open(remotefile_path) as fp:</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Linux批量处理</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Javascript</title>
     <url>/2017/09/15/javascript/</url>
     <content><![CDATA[<h2 id="JavaScript"><a href="#JavaScript" class="headerlink" title="JavaScript"></a>JavaScript</h2><blockquote>
