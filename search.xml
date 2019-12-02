@@ -19,6 +19,202 @@
 ]]></content>
   </entry>
   <entry>
+    <title>HayStack全文检索在Django中的应用</title>
+    <url>/2018/10/16/HayStack%E5%85%A8%E6%96%87%E6%A3%80%E7%B4%A2%E5%9C%A8Django%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/</url>
+    <content><![CDATA[<h2 id="全文检索"><a href="#全文检索" class="headerlink" title="全文检索"></a>全文检索</h2><p><a href="https://django-haystack.readthedocs.io/en/v2.4.1/tutorial.html" target="_blank" rel="noopener">官方文档</a></p><blockquote>
+<p>全文检索就是针对所有内容进行动态匹配搜索的概念</p>
+<p>针对特定的关键词进行<strong>建立索引</strong>并<strong>精确匹配</strong>取出搜索结果，并且达到性能优化的目的</p>
+</blockquote><a id="more"></a>
+
+<ul>
+<li>为啥要有全文检索</li>
+</ul>
+<blockquote>
+<p>最常见的全文检索就是我们在数据库中进行的模糊查询</p>
+<p>但是模糊查询是针对整体内容的一个动态匹配过程，在数据量较大的情况下匹配效率极低</p>
+<p>常规项目中数据量一般都比较多并且内容繁杂，所以正常的项目搜索功能中很少会使用模糊查询进行操作</p>
+<p>如果你开发的项目用户量较少并且项目数据较少，那么此时模糊查询可以是你值得考虑的选项</p>
+</blockquote>
+<ul>
+<li><code>django</code>使用啥进行全文检索</li>
+</ul>
+<blockquote>
+<p><code>Python</code>提供了各种模块进行全文检索，最常见的是<code>haystack</code>模块</p>
+<p>该模块设计为支持<code>whoosh</code>、<code>solr</code>、<code>Xapian</code>、<code>Elasticsearch</code>四种全文检索引擎后端</p>
+<p>使用<code>haystack</code>模块，不用更改代码，直接切换引擎，可以极大的减少代码量</p>
+<p><code>haystack</code>属于一种<strong>全文检索</strong>的框架</p>
+</blockquote>
+<hr>
+<ul>
+<li><strong>whoosh</strong></li>
+</ul>
+<blockquote>
+<p>纯<code>Python</code>编写的全文搜索引擎，是目前最快的<code>python</code>所编写的检索引擎，虽然性能比不上<code>solr</code>、<code>Xapian</code>、<code>Elasticsearch</code>等；但是无二进制包，程序不会莫名其妙的崩溃，对于小型的站点，<code>whoosh</code>已经足够使用</p>
+</blockquote>
+<ul>
+<li><strong>solr</strong></li>
+</ul>
+<blockquote>
+<p><code>Solr</code>是一个高性能，采用<code>Java5</code>开发，基于<code>Lucene</code>的全文搜索服务器。同时对其进行了扩展，提供了比Lucene更为丰富的查询语言，同时实现了可配置、可扩展并对查询性能进行了优化，并且提供了一个完善的功能管理界面，是一款非常优秀的全文搜索引擎</p>
+<p><code>Lucene</code>：不是一个完整的<strong>全文检索引擎</strong>，是一个全文检索引擎的<strong>架构</strong>，提供了完整的查询引擎和索引引擎，<code>Lucene</code>的目的是为软件开发人员提供一个简单易用的工具包，以方便的在目标系统中实现全文检索的功能</p>
+</blockquote>
+<ul>
+<li><strong>Xapian</strong></li>
+</ul>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt; Xapian`是一个用`C++`编写的全文检索程序，他的作用类似于`Java`的`lucene</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<ul>
+<li><strong>Elasticsearch</strong></li>
+</ul>
+<blockquote>
+<p><code>ElasticSearch</code>是一个基于<code>Lucene</code>的搜索服务器它提供了一个分布式多用户能力的全文搜索引擎，基于<code>RESTful web</code>接口</p>
+<p><code>Elasticsearch</code>是用Java开发的，并作为<code>Apache</code>许可条款下的开放源码发布，是当前流行的企业级搜索引擎。该引擎常设计用于云计算中；能够达到<strong>实时搜索</strong>，<strong>稳定</strong>，<strong>可靠</strong>，<strong>快速</strong>，<strong>安装</strong>使用方便</p>
+</blockquote>
+<h3 id="中文分词"><a href="#中文分词" class="headerlink" title="中文分词"></a>中文分词</h3><blockquote>
+<p><code>whoosh</code>作为一个全文搜索引擎模块</p>
+<p>分词功能和检索功能已经非常强大，但是针对中文的处理还是比较欠缺</p>
+<p>可以通过<code>Jieba</code>模块重写分词操作，支持<code>whoosh</code>对中文的强大操作</p>
+</blockquote>
+<ul>
+<li>安装中文分词模块</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pip install jieba</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>除了<code>jieba</code>分词，现在还有很多付费的中文分词模块</p>
+<blockquote>
+<p><a href="http://ictclas.nlpir.org/nlpir/" target="_blank" rel="noopener">中科院计算所NLPIR</a></p>
+<p><a href="https://github.com/NLPchina/ansj_seg" target="_blank" rel="noopener"><code>ansj</code>分词器</a></p>
+<p><a href="https://github.com/HIT-SCIR/ltp" target="_blank" rel="noopener">哈工大的<code>LTP</code></a></p>
+<p><a href="https://github.com/thunlp/THULAC" target="_blank" rel="noopener">清华大学<code>THULAC</code></a></p>
+<p><a href="https://nlp.stanford.edu/software/segmenter.shtml" target="_blank" rel="noopener">斯坦福分词器</a></p>
+<p><a href="https://github.com/hankcs/HanLP" target="_blank" rel="noopener"><code>Hanlp</code>分词器</a></p>
+<p><a href="https://github.com/yanyiwu/cppjieba" target="_blank" rel="noopener">结巴分词</a></p>
+<p><a href="https://github.com/koth/kcws" target="_blank" rel="noopener"><code>KCWS</code>分词器(字嵌入<code>+Bi-LSTM+CRF</code>)</a></p>
+<p><a href="https://github.com/frcchang/zpar/releases" target="_blank" rel="noopener"><code>ZPar</code></a></p>
+<p><a href="https://github.com/wks/ik-analyzer" target="_blank" rel="noopener"><code>IKAnalyzer</code></a></p>
+</blockquote>
+</li>
+</ul>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><ul>
+<li>首先安装<code>HayStack</code>框架以及<code>whoosh</code>搜索引擎</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pip install django-haystack</span><br><span class="line">pip install whoosh</span><br></pre></td></tr></table></figure>
+
+<h3 id="settings配置"><a href="#settings配置" class="headerlink" title="settings配置"></a>settings配置</h3><ul>
+<li>添加<code>haystack</code>应用到项目的<code>settings</code>文件下的<code>app</code>部分</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    &apos;django.contrib.admin&apos;,</span><br><span class="line">	...</span><br><span class="line">    &apos;haystack&apos;,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>添加搜索引擎，这里使用<code>whoosh</code>引擎</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">HAYSTACK_CONNECTIONS = &#123;</span><br><span class="line">    &apos;default&apos;: &#123;</span><br><span class="line">        &apos;ENGINE&apos;: &apos;haystack.backends.whoosh_cn_backend.WhooshEngine&apos;,</span><br><span class="line">        &apos;PATH&apos;: os.path.join(BASE_DIR, &apos;whoosh_index&apos;),</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#这里使用django的信号机制，在数据表发生改动时自动更新whoosh的查询索引</span><br><span class="line">HAYSTACK_SIGNAL_PROCESSOR = &apos;haystack.signals.RealtimeSignalProcessor&apos;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这里要注意的是，我们使用的引擎为<code>whoosh_cn_backend</code></p>
+<p>本身的<code>whoosh</code>引擎名为：<code>whoosh_backend</code></p>
+<p><code>whoosh_cn_backend</code>将在接下来我们对安装目录下的引擎文件复制修改得来</p>
+</blockquote>
+<ul>
+<li>在项目的路由文件下配置查询的路由映射</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">from django.urls import include,re_path</span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(&apos;admin/&apos;, admin.site.urls),</span><br><span class="line">    re_path(&apos;^search/&apos;,include(&apos;haystack.urls&apos;)),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当查询条件被提交时，会跳转至<code>search</code>路由</p>
+<p>并且查询条件会作为<code>get</code>请求时的连接参数传入，参数<code>key</code>值为<code>q</code></p>
+</blockquote>
+<h3 id="创建索引文件"><a href="#创建索引文件" class="headerlink" title="创建索引文件"></a>创建索引文件</h3><ul>
+<li>接下来，在需要被搜索的<code>app</code>下建立<code>search_indexes.py</code>文件，该文件名不许变更</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#app.models.py</span><br><span class="line">class User(models.Model):</span><br><span class="line">    # 用户表</span><br><span class="line">    name = models.CharField(</span><br><span class="line">        max_length=50,</span><br><span class="line">        verbose_name=&apos;昵称&apos;</span><br><span class="line">        )</span><br><span class="line">    account = models.CharField(max_length=50,verbose_name=&apos;账号&apos;,unique=True)</span><br><span class="line">    passwd = models.CharField(max_length=50,verbose_name=&apos;密码&apos;)</span><br><span class="line">    def __str__(self):</span><br><span class="line">        return self.name</span><br><span class="line">#app.search_indexes.py</span><br><span class="line">from haystack import indexes</span><br><span class="line">from . import models</span><br><span class="line"></span><br><span class="line">class UserIndex(indexes.SearchIndex, indexes.Indexable):</span><br><span class="line">    text = indexes.CharField(document=True, use_template=True)</span><br><span class="line"></span><br><span class="line">    def get_model(self):</span><br><span class="line">        return models.User # 当前模型文件下需要被检索的模型类</span><br><span class="line"></span><br><span class="line">    def index_queryset(self, using=None):</span><br><span class="line">        return self.get_model().objects.all()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>该类为索引类，类名为模型类的名称<code>+Index</code>：比如模型类为<code>People</code>,则这里类名为<code>PeopleIndex</code></p>
+<p><code>get_model</code>函数用来获取当前索引类所关联的模型类，这里我们关联上面的<code>User</code> 类对象</p>
+<p><code>text=indexes.CharField</code>语句指定了将模型类中的哪些字段建立索引，而<code>use_template=True</code>说明后续我们将通过一个<strong>数据模板</strong>文件来指明需要检索的字段</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt; document=True</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>为什么要创建索引：索引就像是一本书的目录，可以为读者提供更快速的导航与查找</p>
+</blockquote>
+<h3 id="创建模板数据文件"><a href="#创建模板数据文件" class="headerlink" title="创建模板数据文件"></a>创建模板数据文件</h3><ul>
+<li>创建数据模板文件</li>
+</ul>
+<blockquote>
+<p>数据模板文件路径：<code>templates/search/indexes/yourapp/note_text.txt</code></p>
+<p>放在任何一个你的<code>Django</code>能搜索到的模板文件夹<code>template</code>下面均可，这个文件主要确定要检索的字段，为他们建立索引</p>
+<p>文件名必须为要索引的类名<code>_text.txt</code>，比如这里我们检索的类名是<code>User</code>，那么对应的数据模板文件名为<code>user_text.txt</code>，文件名小写即可</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#template.search.indexes.people.user_text.txt</span><br><span class="line">&#123;&#123; object.name &#125;&#125;</span><br><span class="line">&#123;&#123; object.account &#125;&#125;</span><br><span class="line">&#123;&#123; object.online_time &#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在数据模板文件中使用模板语法，写入需要建立索引的字段，这里我们将模型类中<code>name</code>、<code>account</code>以及<code>online_time</code>字段设置索引，当检索时会对这三个字段去做全文检索</p>
+</blockquote>
+<blockquote>
+<p>接下来创建一个搜索结果展示页面</p>
+</blockquote>
+<h3 id="检索结果模板页面"><a href="#检索结果模板页面" class="headerlink" title="检索结果模板页面"></a>检索结果模板页面</h3><ul>
+<li>创建检索结果展示页面</li>
+</ul>
+<blockquote>
+<p>检索结果展示页面，需要在固定的目录路径下进行模板页面的编写</p>
+<p>路径为：<code>templates/search/</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;title&gt;&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&#123;% if query %&#125;</span><br><span class="line">    &lt;h3&gt;搜索结果如下：&lt;/h3&gt;</span><br><span class="line">    &#123;% for result in page.object_list %&#125;</span><br><span class="line">        &#123;&#123; result.object.name &#125;&#125;</span><br><span class="line">        &lt;br&gt;</span><br><span class="line">        &#123;&#123; result.object.account &#125;&#125;</span><br><span class="line">        &lt;br&gt;</span><br><span class="line">        &#123;&#123; result.object.online_time &#125;&#125;</span><br><span class="line">        &lt;br&gt;</span><br><span class="line">    &#123;% empty %&#125;</span><br><span class="line">        &lt;p&gt;没找到&lt;/p&gt;</span><br><span class="line">    &#123;% endfor %&#125;</span><br><span class="line">    </span><br><span class="line">    &#123;% if page.has_previous or page.has_next %&#125;</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">            &#123;% if page.has_previous %&#125;</span><br><span class="line">            	&lt;a href=&quot;?q=&#123;&#123; query &#125;&#125;&amp;amp;page=&#123;&#123; page.previous_page_number &#125;&#125;&quot;&gt;</span><br><span class="line">            		上一页</span><br><span class="line">            	&lt;/a&gt;</span><br><span class="line">            &#123;% endif %&#125;</span><br><span class="line"></span><br><span class="line">            &#123;% if page.has_next %&#125;</span><br><span class="line">            	&lt;a href=&quot;?q=&#123;&#123; query &#125;&#125;&amp;amp;page=&#123;&#123; page.next_page_number &#125;&#125;&quot;&gt;</span><br><span class="line">            		下一页</span><br><span class="line">            	&lt;/a&gt;</span><br><span class="line">            &#123;% endif %&#125;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">    &#123;% endif %&#125;</span><br><span class="line">&#123;% endif %&#125;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这个模板页面中已经自带了分页功能，可以按照需求修改</p>
+</blockquote>
+<ul>
+<li>创建检索模板页面内容</li>
+</ul>
+<blockquote>
+<p>还需要有一个表单，提交检索信息</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;form method=&apos;get&apos; action=&quot;/search/&quot; &gt;</span><br><span class="line">    &lt;input type=&quot;text&quot; name=&quot;q&quot;&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot; value=&quot;查询&quot;&gt;</span><br><span class="line">&lt;/form&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这部分检索的模板页面内容可以在你的项目中进行添加，查询方式为<code>get</code>，并且检索输入的表单框<code>name</code>属性必须为<code>q</code></p>
+</blockquote>
+<h3 id="中文分词配置"><a href="#中文分词配置" class="headerlink" title="中文分词配置"></a>中文分词配置</h3><ul>
+<li>接下来，需要创建有关中文检索的配置文件，这里的配置文件创建为全局</li>
+</ul>
+<blockquote>
+<p>进入到<code>python</code>的安装目录下，比如我的目录为：<code>C:\Python37\Lib\site-packages\haystack\backends</code></p>
+<p>在该路径下创建名为<code>ChineseAnalyzer.py</code>的中文分词文件</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import jieba</span><br><span class="line">from whoosh.analysis import Tokenizer, Token</span><br><span class="line"></span><br><span class="line">class ChineseTokenizer(Tokenizer):</span><br><span class="line">    def __call__(self, value, positions=False, chars=False,</span><br><span class="line">                 keeporiginal=False, removestops=True,start_pos=0, start_char=0, mode=&apos;&apos;, **kwargs):</span><br><span class="line">        t = Token(positions, chars, removestops=removestops, mode=mode, **kwargs)</span><br><span class="line">        seglist = jieba.cut(value, cut_all=True)</span><br><span class="line">        for w in seglist:</span><br><span class="line">            t.original = t.text = w</span><br><span class="line">            t.boost = 1.0</span><br><span class="line">            if positions:</span><br><span class="line">                t.pos = start_pos + value.find(w)</span><br><span class="line">            if chars:</span><br><span class="line">                t.startchar = start_char + value.find(w)</span><br><span class="line">                t.endchar = start_char + value.find(w) + len(w)</span><br><span class="line">            yield t</span><br><span class="line"></span><br><span class="line">def ChineseAnalyzer():</span><br><span class="line">    return ChineseTokenizer()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在这个文件中，定义了一个<code>ChineseAnalyzer</code>的函数，这个函数将替代搜索引擎配置文件中的分词方式</p>
+</blockquote>
+<ul>
+<li>复制引擎文件，修改分词方式为中文</li>
+</ul>
+<blockquote>
+<p>同样在该文件夹下<code>C:\Python37\Lib\site-packages\haystack\backends</code>，复制<code>whoosh_backend.py</code>文件，创建一个新的文件名为<code>whoosh_cn_backend.py</code>，这里复制出一份文件也是为了之后如果不需要使用中文分词，可以直接在<code>settings</code>配置文件中修改引擎为<code>&#39;ENGINE&#39;:&#39;haystack.backends.whoosh_backend.WhooshEngine&#39;,</code></p>
+</blockquote>
+<blockquote>
+<p>修改该引擎配置文件中的：<code>analyzer=StemmingAnalyzer()</code>变为<code>analyzer=ChineseAnalyzer()</code></p>
+<p>并且要记得在头部引入刚才所编写的中文分词文件</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#whoosh_cn_backend.py</span><br><span class="line">from .ChineseAnalyzer import ChineseAnalyzer</span><br></pre></td></tr></table></figure>
+
+<h3 id="初始化索引"><a href="#初始化索引" class="headerlink" title="初始化索引"></a>初始化索引</h3><ul>
+<li>最后，初始化索引数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">python manage.py rebuild_index</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Django</category>
+      </categories>
+      <tags>
+        <tag>Django</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Paramiko</title>
     <url>/2018/09/15/%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5/</url>
     <content><![CDATA[<h2 id="Paramiko"><a href="#Paramiko" class="headerlink" title="Paramiko"></a>Paramiko</h2><blockquote>
