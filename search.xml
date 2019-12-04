@@ -1,6 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Mysql主从复制</title>
+    <url>/2019/10/12/Mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</url>
+    <content><![CDATA[<h2 id="Mysql主从复制"><a href="#Mysql主从复制" class="headerlink" title="Mysql主从复制"></a>Mysql主从复制</h2><ul>
+<li>什么是<strong>主从复制</strong>？</li>
+</ul><blockquote>
+<p>主从复制至少需要两台服务器，或两个<strong>mysql</strong>服务，可以配置一主多从，多主多从</p>
+<p>建立与某个业务数据库一样的数据库环境，即为主从复制</p>
+<p>一般情况下，主库用以写，而从库用以读</p>
+</blockquote><a id="more"></a>
+
+<ul>
+<li>为什么要搭建主从复制？<ol>
+<li>构建主从热备，当某天数据库宕机或或数据丢失情况，可以有备份数据库继续工作</li>
+<li>降低IO频次，多库之间可以合理分配读写压力，提高单个数据库服务的数据库访问压力</li>
+<li>隔离读写，在某些锁表情况下，可以使数据库读操作继续进行</li>
+</ol>
+</li>
+</ul>
+<ul>
+<li>主从复制原理</li>
+</ul>
+<blockquote>
+<p>利用数据库<strong>bin-log</strong>二进制文件，该文件包含有数据库操作的所有SQL语句</p>
+<p>复制该文件至其余数据库服务中并执行即可</p>
+</blockquote>
+<ul>
+<li><p>主从复制过程</p>
+<ol>
+<li><p>当主库具有新数据时，主库会被从库请求，建立线程进行连接，用以传输<strong>binlog</strong>日志</p>
+</li>
+<li><p>从库开启两个线程</p>
+<blockquote>
+<p>A线程：也叫做<strong>IO线程</strong>，连接主库，并请求binlog中的更新记录至从库中，写入至从库的<strong>relaylog</strong>文件中</p>
+<p>B线程：也叫做<strong>SQL线程</strong>，读取<strong>relaylog</strong>文件中的更新操作并执行</p>
+</blockquote>
+</li>
+<li><p>如果，有多个从库同时存在，主库会为每个从库建立一个<strong>binlog</strong>输出线程</p>
+</li>
+</ol>
+</li>
+</ul>
+<p><a href="https://lienze.tech/blog/images/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8E%9F%E7%90%86%E8%87%AA%E7%BB%98.png" target="_blank" rel="noopener"><img src="https://lienze.tech/blog/images/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8E%9F%E7%90%86%E8%87%AA%E7%BB%98.png" alt="主从复制原理自绘"></a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">set global validate_password_policy=LOW;</span><br><span class="line">set global validate_password_length=6;</span><br></pre></td></tr></table></figure>
+
+<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><blockquote>
+<p>此处以一主一丛为例</p>
+</blockquote>
+<ul>
+<li>系统环境<ul>
+<li>主库（master）：192.168.1.100</li>
+<li>从库（slave）：192.168.1.101</li>
+</ul>
+</li>
+</ul>
+<h3 id="主库修改"><a href="#主库修改" class="headerlink" title="主库修改"></a>主库修改</h3><ul>
+<li>主库配置修改</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">server-id = 1</span><br><span class="line">log-bin=mysql-bin # 开启log bin</span><br><span class="line">expire_logs_days=7 # 日志保存时间</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>server-id</strong>：</p>
+<p>同步数据中必须包含<strong>server-id</strong>，用于标识该语句最初是从哪个<strong>server</strong>写入</p>
+<p>每个<strong>slave</strong>端只能有一个线程在<strong>master</strong>端连接，如果两个<strong>salve</strong>端的<strong>server-id</strong>一致，一个连接成功之后，前一个连接将会被断开</p>
+<p>主主同步时，避免数据同步陷入死循环</p>
+</blockquote>
+<ul>
+<li>主库创建用户，用以从机连接获取<strong>binlog</strong>日志</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant replication slave on *.* to &apos;master&apos;@&apos;%&apos; identified by &apos;123456&apos;;</span><br><span class="line">flush privileges;</span><br><span class="line">grant all privileges on *.* to master@&apos;%&apos; identified by &quot;123456&quot;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查看master状态（包括日志文件名和对应位置）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show master status;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>记录上条命令返回的<strong>binlog</strong>文件名，<strong>Position</strong>属性，从机连接的时候要用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+------------------+----------+--------------+------------------+-------------------+</span><br><span class="line">| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |</span><br><span class="line">+------------------+----------+--------------+------------------+-------------------+</span><br><span class="line">| mysql-bin.000001 |      154 |              |                  |                   |</span><br><span class="line">+------------------+----------+--------------+------------------+-------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<h3 id="从库修改"><a href="#从库修改" class="headerlink" title="从库修改"></a>从库修改</h3><ul>
+<li>从库配置修改</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">server-id=11</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>master</strong>与<strong>slave</strong>端的<strong>server-id</strong>不能一样</p>
+<p><strong>salve</strong>端无需开启<strong>log-bin</strong>功能</p>
+</blockquote>
+<ul>
+<li>从库指定master，执行如下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">change master to master_host=&apos;118.31.76.26&apos;, master_port=3306, master_user=&apos;master&apos;, master_password=&apos;123456&apos;, master_log_file=&apos;mysql-bin.000001&apos;, master_log_pos=603;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>启动从机</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">start slave;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>从机连接停止（配置错误，从新连接时使用）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">stop slave;</span><br><span class="line">reset slave all;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询连接状态</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show slave status \G;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>显示为正确</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">*************************** 1. row ***************************</span><br><span class="line">Slave_IO_State: Waiting for master to send event</span><br><span class="line">Master_Host: 192.168.1.9</span><br><span class="line">Master_User: reader</span><br><span class="line">Master_Port: 3307</span><br><span class="line">Connect_Retry: 60</span><br><span class="line">Master_Log_File: mysql-bin.000007</span><br><span class="line">Read_Master_Log_Pos: 501</span><br><span class="line">Relay_Log_File: 0b763a8d1ddd-relay-bin.000002</span><br><span class="line">Relay_Log_Pos: 320</span><br><span class="line">Relay_Master_Log_File: mysql-bin.000007</span><br><span class="line">Slave_IO_Running: Yes</span><br><span class="line">Slave_SQL_Running: Yes</span><br><span class="line">Last_IO_Error: 错误显示地方</span><br></pre></td></tr></table></figure>
+
+<h3 id="同步特定的库"><a href="#同步特定的库" class="headerlink" title="同步特定的库"></a>同步特定的库</h3><h4 id="主机处配置"><a href="#主机处配置" class="headerlink" title="主机处配置"></a>主机处配置</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">binlog-do-db=xxxx   # 二进制日志记录的数据库</span><br><span class="line">binlog-ignore-db=xxxx # 二进制日志中忽略数据库</span><br></pre></td></tr></table></figure>
+
+<h4 id="从机处配置"><a href="#从机处配置" class="headerlink" title="从机处配置"></a>从机处配置</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">replicate-do-db    # 设定需要复制的数据库</span><br><span class="line">replicate-ignore-db # 设定需要忽略的复制数据库</span><br><span class="line">replicate-do-table  # 设定需要复制的表</span><br><span class="line">replicate-ignore-table # 设定需要忽略的复制表</span><br><span class="line">replicate-wild-do-table # 同replication-do-table功能一样，但是可以通配符</span><br><span class="line">replicate-wild-ignore-table # 同replication-ignore-table功能一样，但是可以加通配符</span><br></pre></td></tr></table></figure>
+
+<h3 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h3><ul>
+<li><strong>mysql</strong>-&gt;<strong>mariadb</strong>版本问题</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Last_IO_Error: Got fatal error 1236 from master when reading data from binary log: &apos;Client requested master to start replication from position &gt; file size&apos;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>从<strong>MySQL5.6</strong>开始引入了<strong>binlog_checksum</strong>全局变量，即<strong>MySQL</strong>会将<strong>event</strong>的<strong>CRC32</strong>校验值也写入<strong>binlog</strong>，显然<strong>MariaDB</strong>在分析日志的时候不会考虑该信息，导致解析出错</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show variables like &apos;%binlog%&apos;;</span><br><span class="line">set global binlog_checksum=NONE;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Mysql</category>
+      </categories>
+      <tags>
+        <tag>Mysql</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/2019/09/30/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p><a id="more"></a>
