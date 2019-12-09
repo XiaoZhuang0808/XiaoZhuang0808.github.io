@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="渔夫的美好生活" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Linux 随着IT产业的不断发展，Linux操作系统应用领域越来越广泛，尤其是近年来Linux在服务器领域飞速的发展，主要得益于Linux操作系统具备的如下优点">
+<meta name="keywords" content="Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux基础操作">
+<meta property="og:url" content="http://xiaozhuang.tech/2018/12/12/Linux基础操作/index.html">
+<meta property="og:site_name" content="渔夫的美好生活">
+<meta property="og:description" content="Linux 随着IT产业的不断发展，Linux操作系统应用领域越来越广泛，尤其是近年来Linux在服务器领域飞速的发展，主要得益于Linux操作系统具备的如下优点">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-09T09:06:13.548Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux基础操作">
+<meta name="twitter:description" content="Linux 随着IT产业的不断发展，Linux操作系统应用领域越来越广泛，尤其是近年来Linux在服务器领域飞速的发展，主要得益于Linux操作系统具备的如下优点">
+
+<link rel="canonical" href="http://xiaozhuang.tech/2018/12/12/Linux基础操作/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Linux基础操作 | 渔夫的美好生活</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">渔夫的美好生活</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">记录美好生活</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaozhuang.tech/2018/12/12/Linux基础操作/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cao.jpg">
+      <meta itemprop="name" content="Xiao Zhuang">
+      <meta itemprop="description" content="小试牛刀">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="渔夫的美好生活">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux基础操作
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-12-12 12:34:00" itemprop="dateCreated datePublished" datetime="2018-12-12T12:34:00+08:00">2018-12-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h2><blockquote>
+<p>随着IT产业的不断发展，<code>Linux</code>操作系统应用领域越来越广泛，尤其是近年来<code>Linux</code>在服务器领域飞速的发展，主要得益于<code>Linux</code>操作系统具备的如下优点</p>
+</blockquote><a id="more"></a>
+<ul>
+<li>开源免费</li>
+<li>系统迭代更新</li>
+<li>系统性能稳定</li>
+<li>安全性高</li>
+<li>多任务、多用户</li>
+<li>耗资源小、无需图形化界面</li>
+<li>内核小</li>
+<li>应用领域广泛</li>
+<li>使用及入门容易</li>
+</ul>
+<h3 id="操作系统分类简介"><a href="#操作系统分类简介" class="headerlink" title="操作系统分类简介"></a>操作系统分类简介</h3><blockquote>
+<p>学习<code>Linux</code>操作系统，需要选择不同的发行版本</p>
+<p><code>Linux</code>操作系统是一个大类别，<code>Linux</code>操作系统主流发行版本包括：<code>Red Hat Linux</code>、<code>CentOS</code>、<code>Ubuntu</code>、<code>SUSE Linux</code>、<code>Fedora Linux</code>等，具体发行版本区别如下</p>
+</blockquote>
+<ul>
+<li><code>Red Hat Linux</code></li>
+</ul>
+<blockquote>
+<p><code>Red Hat Linux</code>是最早的<code>Linux</code>发行版本之一</p>
+<p>同时也是最著名的<code>Linux</code>版本，<code>Red Hat Linux</code>已经创造了自己的品牌，也是读者经常听到的“红帽操作系统”</p>
+<p><code>Red Hat 1994</code>年创立，目前公司全世界有<code>3000</code>多人，一直致力于开放的源代码体系，向用户提供一套完整的服务，这使得它特别适合在公共网络中使用</p>
+<p>这个版本的<code>Linux</code>也使用最新的内核，还拥有大多数人都需要使用的主体软件包</p>
+</blockquote>
+<ul>
+<li><code>CentOS</code></li>
+</ul>
+<blockquote>
+<p>社区企业版操作系统（<code>Community Enterprise Operating System</code>，<code>CentOS</code>）是<code>Linux</code>发行版之一，它是来自于<code>Red Hat Enterprise Linux</code>依照开放源代码所编译而成。由于出自同样的源代码，因此有些要求高度稳定性的服务器以<code>CentOS</code>替代商业版的<code>Red Hat Enterprise Linux</code>使用。</p>
+<p><code>CentOS</code>于<code>Red Hat Linux</code>不同之处在于<code>CentOS</code>并不包含封闭的源代码软件，可以开源免费使用，得到运维人员、企业、程序员的青睐，<code>CentOS</code>发行版操作系统是目前企业使用最多的系统之一</p>
+<p><code>2016年12月12日</code>，<code>CentOS</code>基于<code>Red Hat Enterprise Linux的CentOS Linux 7 (1611)</code>系统正式对外发布</p>
+</blockquote>
+<ul>
+<li><code>Ubuntu</code></li>
+</ul>
+<blockquote>
+<p><code>Ubuntu</code>是一个以桌面应用为主的<code>Linux</code>操作系统，其名称来自非洲南部祖鲁语或豪萨语的“<code>ubuntu</code>”一词（译为吾帮托或乌班图），意思是“人性”、“我的存在是因为大家的存在”，是非洲传统的一种价值观</p>
+<p><code>Ubuntu</code>基于<code>Debian</code>发行版和<code>GNOME</code>桌面环境，<code>Ubuntu</code>发行版操作系统的目标在于为一般用户提供一个最新的、同时稳定的以开放自由软件构建而成的操作系统，目前<code>Ubuntu</code>具有庞大的社区力量，用户可以方便地从社区获得帮助</p>
+</blockquote>
+<ul>
+<li><code>SUSE Linux</code></li>
+</ul>
+<blockquote>
+<p><code>SUSE</code>(发音 /ˈsuːsə/)，<code>SUSE Linux</code>出自德国，<code>SuSE Linux AG</code>公司发行维护的<code>Linux</code>发行版，是属于此公司的注册商标<code>2003年11月4日</code>，<code>Novell</code>表示将会对<code>SUSE</code>提出收购。收购的工作于<code>2004年1月</code>完成。</p>
+<p><code>Novell</code>也向大家保证<code>SUSE</code>的开发工作仍会继续下去，<code>Novell</code>更把公司内全线电脑的系统换成<code>SUSE LINUX</code>，并同时表示将会把<code>SUSE</code>特有而优秀的系统管理程序 - <code>YaST2</code>以<code>GPL</code>授权释出</p>
+</blockquote>
+<ul>
+<li><code>Fedora Linux</code></li>
+</ul>
+<blockquote>
+<p><code>Fedora</code>是一个知名的<code>Linux</code>发行版，是一款由全球社区爱好者构建的面向日常应用的快速、稳定、强大的操作系统。</p>
+<p>它允许任何人自由地使用、修改和重发布，无论现在还是将来。它由一个强大的社群开发。</p>
+<p>这个社群的成员以自己的不懈努力，提供并维护自由、开放源码的软件和开放的标准。<code>Fedora</code>约每六个月会发布新版本</p>
+</blockquote>
+<h3 id="Linux命令"><a href="#Linux命令" class="headerlink" title="Linux命令"></a>Linux命令</h3><h4 id="cd"><a href="#cd" class="headerlink" title="cd"></a><code>cd</code></h4><blockquote>
+<p>目录切换</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd .. # 上一层目录</span><br><span class="line">cd # 家目录</span><br><span class="line">cd ~ # 家目录</span><br><span class="line">cd / # 根目录</span><br></pre></td></tr></table></figure>
+
+<h4 id="ls"><a href="#ls" class="headerlink" title="ls"></a><code>ls</code></h4><blockquote>
+<p>浏览目录下的文件或文件夹</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ls -a # 列举所有文件或目录，包含.开头的隐藏文件</span><br><span class="line">ls -l # 详细信息列举文件或目录</span><br><span class="line">ls -i # 列出每个文件的Inode号</span><br><span class="line">ls -t # 根据修改时间列出文件</span><br></pre></td></tr></table></figure>
+
+<h4 id="pwd"><a href="#pwd" class="headerlink" title="pwd"></a><code>pwd</code></h4><blockquote>
+<p>显示当前所处目录</p>
+</blockquote>
+<h4 id="mkdir"><a href="#mkdir" class="headerlink" title="mkdir"></a><code>mkdir</code></h4><blockquote>
+<p>创建目录</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir a # 创建a目录</span><br><span class="line">mkdir -p a/b/c # 递归创建目录</span><br></pre></td></tr></table></figure>
+
+<h4 id="rm"><a href="#rm" class="headerlink" title="rm"></a><code>rm</code></h4><blockquote>
+<p>删除文件或目录</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rm a # 删除a文件</span><br><span class="line">rm -r a # 删除a目录</span><br><span class="line">rm -rf a # 强制删除a文件，不提示确认</span><br></pre></td></tr></table></figure>
+
+<h4 id="cp"><a href="#cp" class="headerlink" title="cp"></a><code>cp</code></h4><blockquote>
+<p>拷贝或备份文件</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp /root/1.py /home/1.py # 拷贝文件至新目录下</span><br></pre></td></tr></table></figure>
+
+<h4 id="mv"><a href="#mv" class="headerlink" title="mv"></a><code>mv</code></h4><blockquote>
+<p>重命名或移动文件或目录</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv /root/1.py /home/1.py.bak # 移动文件并重新命名</span><br></pre></td></tr></table></figure>
+
+<h4 id="touch"><a href="#touch" class="headerlink" title="touch"></a><code>touch</code></h4><blockquote>
+<p>创建普通文件</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">touch 1.py # 创建1.py文件</span><br></pre></td></tr></table></figure>
+
+<h4 id="cat"><a href="#cat" class="headerlink" title="cat"></a><code>cat</code></h4><blockquote>
+<p>查看文件内容</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/redis/redis.conf # 查看redis.conf文件</span><br><span class="line">cat -n # 对输出所有行进行编号</span><br><span class="line">cat -b # 对输出非空行进行编号</span><br></pre></td></tr></table></figure>
+
+<h4 id="head"><a href="#head" class="headerlink" title="head"></a><code>head</code></h4><blockquote>
+<p>查看文件头部内容，通常为十行</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">head -3 /etc/memcached.conf # 查看前三行</span><br><span class="line">head -n 100 # 查看前100行</span><br><span class="line">head -c 3 # 查看前三字节</span><br></pre></td></tr></table></figure>
+
+<h4 id="tail"><a href="#tail" class="headerlink" title="tail"></a><code>tail</code></h4><blockquote>
+<p>查看文件头部内容，通常为十行</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tail -n 3 1.txt # 查看后3行</span><br><span class="line">tail -f # 阻塞并即使输出文件变化后追加的数据</span><br></pre></td></tr></table></figure>
+
+<h4 id="chmod"><a href="#chmod" class="headerlink" title="chmod"></a><code>chmod</code></h4><blockquote>
+<p>修改文件或目录权限</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 775 1.py # 赋予文件775权限 rwx rwx r-x</span><br></pre></td></tr></table></figure>
+
+<h4 id="chown"><a href="#chown" class="headerlink" title="chown"></a><code>chown</code></h4><blockquote>
+<p>修改文件或目录所属组及所属用户</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown –R root.root /tmp/test.txt # 文件所属用户及所属组均为root</span><br></pre></td></tr></table></figure>
+
+<h4 id="df"><a href="#df" class="headerlink" title="df"></a><code>df</code></h4><blockquote>
+<p>磁盘信息查询</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">df -h # 查询磁盘使用量</span><br><span class="line">df -i # 分区Inode使用量</span><br></pre></td></tr></table></figure>
+
+<h4 id="du"><a href="#du" class="headerlink" title="du"></a><code>du</code></h4><blockquote>
+<p>查看文件大小</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">du -h 1.txt # 查看1.txt文件大小</span><br></pre></td></tr></table></figure>
+
+<h4 id="echo"><a href="#echo" class="headerlink" title="echo"></a><code>echo</code></h4><blockquote>
+<p>打印或输出内容</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">echo &apos;hello&apos; # 输出hello</span><br><span class="line">echo &apos;hello&apos; &gt; 1.md # 以hello内容覆盖1.md</span><br><span class="line">echo &apos;hello&apos; &gt;&gt; 1.md # 以hello追加至1.md文件中</span><br></pre></td></tr></table></figure>
+
+<h4 id="tar"><a href="#tar" class="headerlink" title="tar"></a><code>tar</code></h4><blockquote>
+<p>解压或压缩文件</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tar -jxvf # 解压bz2属性的压缩包</span><br><span class="line">tar -zxvf # 解压gz属性的压缩包</span><br><span class="line">tar -czvf # 使用gzip格式压缩文件</span><br><span class="line">tar -cjvf # 使用bzip2格式压缩文件</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xiao Zhuang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaozhuang.tech/2018/12/12/Linux基础操作/" title="Linux基础操作">http://xiaozhuang.tech/2018/12/12/Linux基础操作/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <div>
+        
+          <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+        
+      </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2018/10/16/HayStack全文检索在Django中的应用/" rel="next" title="HayStack全文检索在Django中的应用">
+                  <i class="fa fa-chevron-left"></i> HayStack全文检索在Django中的应用
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2019/09/30/hello-world/" rel="prev" title="Hello World">
+                  Hello World <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux"><span class="nav-text">Linux</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#操作系统分类简介"><span class="nav-text">操作系统分类简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux命令"><span class="nav-text">Linux命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#cd"><span class="nav-text">cd</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ls"><span class="nav-text">ls</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pwd"><span class="nav-text">pwd</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mkdir"><span class="nav-text">mkdir</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#rm"><span class="nav-text">rm</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#cp"><span class="nav-text">cp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mv"><span class="nav-text">mv</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#touch"><span class="nav-text">touch</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#cat"><span class="nav-text">cat</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#head"><span class="nav-text">head</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tail"><span class="nav-text">tail</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chmod"><span class="nav-text">chmod</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chown"><span class="nav-text">chown</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#df"><span class="nav-text">df</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#du"><span class="nav-text">du</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#echo"><span class="nav-text">echo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tar"><span class="nav-text">tar</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Xiao Zhuang"
+    src="/images/cao.jpg">
+  <p class="site-author-name" itemprop="name">Xiao Zhuang</p>
+  <div class="site-description" itemprop="description">小试牛刀</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" title="GitHub &rarr; https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1624611910@qq.com" title="E-Mail &rarr; mailto:1624611910@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘国壮</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,0' opacity='0.5' zIndex='-1' count='150' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.2"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
