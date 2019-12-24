@@ -155,11 +155,12 @@ body {
   height: 100%;
 }
 body {
-  background: #eee;
+  background: url("https://source.unsplash.com/random/1600x900");
   color: #555;
   font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;
-  font-size: 1em;
-  line-height: 2;
+  font-size: 0.9em;
+  line-height: 2.5;
+  background-attachment: fixed;
 }
 @media (max-width: 991px) {
   body {
@@ -411,7 +412,7 @@ code {
 code {
   background: #eee;
   border-radius: 3px;
-  color: #555;
+  color: $whi-light;
   padding: 2px 4px;
   overflow-wrap: break-word;
   word-wrap: break-word;
@@ -1187,7 +1188,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #fff2e9;
+  background: #73531c;
   border-radius: 50%;
   content: ' ';
   display: inline-block;

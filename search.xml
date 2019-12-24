@@ -5,11 +5,13 @@
     <url>/2019/10/12/DB-router/</url>
     <content><![CDATA[<h2 id="DB-router"><a href="#DB-router" class="headerlink" title="DB-router"></a>DB-router</h2><blockquote>
 <p>通过编写<strong>db-router</strong>可以灵性连接<strong>mysql</strong>主从复制等情况下的多数据库</p>
-</blockquote><a id="more"></a>
+</blockquote>
 <ul>
 <li>假设你已经配置好了类似<strong>MYSQL</strong>主从复制的服务，如果没有可以参照<a href="https://lienze.tech/blog/mysql/c813917a.html" target="_blank" rel="noopener">这里</a></li>
 </ul>
-<h3 id="配置Django数据库连接"><a href="#配置Django数据库连接" class="headerlink" title="配置Django数据库连接"></a>配置Django数据库连接</h3><ul>
+<h3 id="配置Django数据库连接"><a href="#配置Django数据库连接" class="headerlink" title="配置Django数据库连接"></a>配置Django数据库连接</h3><a id="more"></a>
+
+<ul>
 <li>settings.py</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">DATABASES = &#123;</span><br><span class="line">    &apos;default&apos;: &#123;</span><br><span class="line">        &apos;ENGINE&apos;: &apos;django.db.backends.mysql&apos;,</span><br><span class="line">        &apos;HOST&apos;: &apos;192.168.1.101&apos;,</span><br><span class="line">        &apos;PORT&apos;: 3306,</span><br><span class="line">        &apos;USER&apos;: &apos;root&apos;,</span><br><span class="line">        &apos;PASSWORD&apos;: &apos;123456&apos;,</span><br><span class="line">        &apos;NAME&apos;: &apos;test1&apos;</span><br><span class="line">    &#125;,</span><br><span class="line">    &apos;slave&apos;: &#123;</span><br><span class="line">        &apos;ENGINE&apos;: &apos;django.db.backends.mysql&apos;,</span><br><span class="line">        &apos;HOST&apos;: &apos;192.168.1.102&apos;,</span><br><span class="line">        &apos;PORT&apos;: 3306,</span><br><span class="line">        &apos;USER&apos;: &apos;root&apos;,</span><br><span class="line">        &apos;PASSWORD&apos;: &apos;123456&apos;,</span><br><span class="line">        &apos;NAME&apos;: &apos;test1&apos;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">DATABASE_ROUTERS = [&apos;pro.utils.MasterSlaveDBRouter&apos;]</span><br></pre></td></tr></table></figure>
@@ -40,11 +42,13 @@
     <url>/2019/10/12/Mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</url>
     <content><![CDATA[<h2 id="Mysql主从复制"><a href="#Mysql主从复制" class="headerlink" title="Mysql主从复制"></a>Mysql主从复制</h2><ul>
 <li>什么是<strong>主从复制</strong>？</li>
-</ul><blockquote>
+</ul>
+<blockquote>
 <p>主从复制至少需要两台服务器，或两个<strong>mysql</strong>服务，可以配置一主多从，多主多从</p>
 <p>建立与某个业务数据库一样的数据库环境，即为主从复制</p>
 <p>一般情况下，主库用以写，而从库用以读</p>
-</blockquote><a id="more"></a>
+</blockquote>
+<a id="more"></a>
 
 <ul>
 <li>为什么要搭建主从复制？<ol>
@@ -178,29 +182,220 @@
       </tags>
   </entry>
   <entry>
-    <title>Hello World</title>
-    <url>/2019/09/30/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p><a id="more"></a>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+    <title>OS模块</title>
+    <url>/2019/03/04/OS%E6%A8%A1%E5%9D%97/</url>
+    <content><![CDATA[<h3 id="OS模块"><a href="#OS模块" class="headerlink" title="OS模块"></a>OS模块</h3><blockquote>
+<p>使用os模块时，不需要考虑平台差异，解释器会帮大家选择正确的系统支持<br>可以对进程和进程运行环境进行管理<br>该模块还可以处理大部分文件系统操作，比如<strong>删除</strong>，<strong>重命名</strong>文件，<strong>遍历目录树</strong>，以及<strong>管理文件</strong>访问权限。</p>
+</blockquote>
+<a id="more"></a>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<ul>
+<li>os模块主要有以下几种 :<ul>
+<li><strong>posix</strong> (类unix操作系统)</li>
+<li><strong>nt</strong> (win)</li>
+<li><strong>mac</strong> (旧版本的<strong>MacOs</strong>)</li>
+<li><strong>dos</strong> (DOS)**</li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li><p><strong>os</strong>和<strong>sys</strong>：</p>
+<blockquote>
+<p>os负责程序与<strong>操作系统</strong>的交互<br>sys负责程序与<strong>解释器</strong>的交互</p>
+</blockquote>
+<hr>
+</li>
+<li><p><strong>os.path</strong>和<strong>sys.path</strong>：</p>
+<blockquote>
+<p>sys.path是<strong>PATH</strong>环境变量<br>os.path是os模块下的子模块，提供了一些关于路径处理的函数</p>
+</blockquote>
+</li>
+</ul>
+<hr>
+<h4 id="os模块常用函数"><a href="#os模块常用函数" class="headerlink" title="os模块常用函数"></a>os模块常用函数</h4><ul>
+<li>os.name：输出字符串指示正在使用的平台</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.name</span><br><span class="line">&apos;nt&apos;</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+<hr>
+<ul>
+<li>os.getcwd()：得到当前<strong>工作目录</strong>(就是你的进程所工作的目录)，即当前脚本工作路径</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.getcwd()</span><br><span class="line">&apos;C:\\Users\\Administrator&apos;</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li><strong>运行目录</strong>：执行程序时的路径</li>
+<li><strong>工作目录</strong>：程序运行时，程序中我们要操作其他文件时使用的的一系列相对路径(相对路径需要参照)，工作目录可在程序运行时更改</li>
+</ul>
+</blockquote>
+<hr>
+<ul>
+<li>os.listdir()：返回指定目录下的所有文件和目录名的一个列表，但是并没有列出来什么是目录，什么是文件。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.listdir()</span><br><span class="line">&gt;&gt;&gt; os.listdir()</span><br><span class="line">[ &apos;桌面&apos;, &apos;下载&apos;, &apos;模板&apos;, &apos;公共&apos;, &apos;文档&apos;, &apos;音乐&apos;, &apos;图片&apos;, &apos;视频&apos;]</span><br><span class="line">#结果为列表，但是并没有列出谁是目录，谁是文件</span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-]]></content>
+<hr>
+<ul>
+<li>os.remove(‘file_name’)：<strong>删除</strong>指定<strong>文件</strong>，文件不存在则报错</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.remove(&apos;1.txt&apos;)</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;</span><br><span class="line">FileNotFoundError: [Errno 2] No such file or directory: &apos;1.txt&apos;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li>os.rmdir(‘dir_name’)：<strong>删除</strong>指定<strong>目录</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.remove(&apos;桌面&apos;)</span><br><span class="line">#删除桌面目录</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li>os.mkdir(‘dir_name’)：<strong>创建</strong>目录</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.mkdir(&apos;桌面&apos;)</span><br><span class="line">#创建目录名为桌面</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li>os.makedirs(‘a/b/c’)：<strong>递归创建</strong>目录</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.makedirs(&apos;a/b/c&apos;)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li>os.system(‘ls’)：执行<strong>shell</strong>命令</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.system(&apos;su rm -rf /*&apos;)</span><br><span class="line">#四大皆空</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li>os.chdir(‘file_path’)：改变<strong>工作目录</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.getcwd()</span><br><span class="line">&apos;C:\\Users\\Administrator&apos;</span><br><span class="line">&gt;&gt;&gt; os.chdir(&apos;C:\\Users&apos;)</span><br><span class="line">&gt;&gt;&gt; os.getcwd()</span><br><span class="line">&apos;C:\\Users&apos;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li>os.chmod(‘file_name’)：改变文件或目录的<strong>权限</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.chmod(&apos;1.txt&apos;,445)</span><br><span class="line">&gt;&gt;&gt; os.system(&apos;ls -l 1.txt&apos;)</span><br><span class="line">-rw-rwxr-x 1 root root 0 1月  19 11:42 1.txt</span><br><span class="line">0</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="Os-path模块常用函数"><a href="#Os-path模块常用函数" class="headerlink" title="Os.path模块常用函数"></a>Os.path模块常用函数</h3><ul>
+<li><p>os.path.abspath(‘file_name’)</p>
+<p>：</p>
+<ul>
+<li>返回文件或目录的绝对路径</li>
+<li>不会检查是否存在该文件或目录</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.path.abspath(&apos;1.txt&apos;)</span><br><span class="line">&apos;/root/1.txt&apos;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li><p>os.path.split(‘file_path’)</p>
+<p>：</p>
+<ul>
+<li>将路径分隔成目录和文件名，并以一个元组返回</li>
+<li>不会检查是否存在该文件或目录</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.path.split(&apos;/root/1.txt&apos;)</span><br><span class="line">(&apos;/root&apos;, &apos;1.txt&apos;)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li><p>os.path.basename(‘path’)</p>
+<p>：</p>
+<ul>
+<li>返回路径最后的文件名</li>
+<li>如果后面还有\ / 那么返回一个空字符串</li>
+<li>不会检查是否存在该文件或目录</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.path.basename(&apos;/root/1.txt&apos;)</span><br><span class="line">&apos;1.txt&apos;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li><p>os.path.exists(‘file_path’)</p>
+<p>：</p>
+<ul>
+<li>如果路径存在，则返回True，反之返回False</li>
+<li>与上面的函数不同，他就是检查这个路径是否存在</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.path.exists(&apos;/root/2.txt&apos;)</span><br><span class="line">False</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li><p>os.path.join(‘file_path’，’file_name’)</p>
+<p>：</p>
+<ul>
+<li>路径拼接</li>
+<li>不会检查是否存在该文件或目录</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.path.join(&apos;/root&apos;,&apos;abc&apos;)</span><br><span class="line">&apos;/root/abc&apos;</span><br><span class="line">&gt;&gt;&gt; os.path.join(&apos;root&apos;,&apos;abc&apos;)</span><br><span class="line">&apos;root/abc&apos;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li><p>os.path.isdir(‘name’)</p>
+<p>：</p>
+<ul>
+<li>判断是否为目录，返回值为bool</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.path.isdir(&apos;/root&apos;)</span><br><span class="line">True</span><br><span class="line">&gt;&gt;&gt; os.path.isdir(&apos;1.txt&apos;)</span><br><span class="line">False</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li><p>os.path.isfile(‘name’)</p>
+<p>：</p>
+<ul>
+<li>判断是否为文件，返回值为bool</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.path.isfile(&apos;/root&apos;)</span><br><span class="line">False</span><br><span class="line">&gt;&gt;&gt; os.path.isfile(&apos;1.txt&apos;)</span><br><span class="line">True</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li><p>os.path.islink(‘name’)</p>
+<p>：</p>
+<ul>
+<li>判断是否是链接，返回值为bool</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.path.islink(&apos;1.txt&apos;)</span><br><span class="line">False</span><br><span class="line">&gt;&gt;&gt; os.path.islink(&apos;/usr/bin/python3&apos;)</span><br><span class="line">True</span><br><span class="line">#ln -s 是我们在linux下创建连接的命令，类似win下的快捷方式</span><br></pre></td></tr></table></figure>
+
+<hr>
+<ul>
+<li><p>os.path.getsize(‘path’)</p>
+<p>：</p>
+<ul>
+<li>返回文件大小</li>
+<li>如果文件不存在，抛出异常</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; os.path.getsize(&apos;1.txt&apos;)</span><br><span class="line">0</span><br><span class="line">&gt;&gt;&gt; os.path.getsize(&apos;2.txt&apos;)</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;</span><br><span class="line">  File &quot;/usr/local/python3/lib/python3.6/genericpath.py&quot;, line 50, in getsize</span><br><span class="line">    return os.stat(filename).st_size</span><br><span class="line">FileNotFoundError: [Errno 2] No such file or directory: &apos;2.txt&apos;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+      </tags>
   </entry>
   <entry>
     <title>Linux基础操作</title>
     <url>/2018/12/12/Linux%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C/</url>
     <content><![CDATA[<h2 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h2><blockquote>
 <p>随着IT产业的不断发展，<code>Linux</code>操作系统应用领域越来越广泛，尤其是近年来<code>Linux</code>在服务器领域飞速的发展，主要得益于<code>Linux</code>操作系统具备的如下优点</p>
-</blockquote><a id="more"></a>
+</blockquote>
 <ul>
 <li>开源免费</li>
 <li>系统迭代更新</li>
@@ -212,6 +407,10 @@
 <li>应用领域广泛</li>
 <li>使用及入门容易</li>
 </ul>
+<a id="more"></a>
+
+
+
 <h3 id="操作系统分类简介"><a href="#操作系统分类简介" class="headerlink" title="操作系统分类简介"></a>操作系统分类简介</h3><blockquote>
 <p>学习<code>Linux</code>操作系统，需要选择不同的发行版本</p>
 <p><code>Linux</code>操作系统是一个大类别，<code>Linux</code>操作系统主流发行版本包括：<code>Red Hat Linux</code>、<code>CentOS</code>、<code>Ubuntu</code>、<code>SUSE Linux</code>、<code>Fedora Linux</code>等，具体发行版本区别如下</p>
@@ -347,10 +546,12 @@
   <entry>
     <title>HayStack全文检索在Django中的应用</title>
     <url>/2018/10/16/HayStack%E5%85%A8%E6%96%87%E6%A3%80%E7%B4%A2%E5%9C%A8Django%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/</url>
-    <content><![CDATA[<h2 id="全文检索"><a href="#全文检索" class="headerlink" title="全文检索"></a>全文检索</h2><p><a href="https://django-haystack.readthedocs.io/en/v2.4.1/tutorial.html" target="_blank" rel="noopener">官方文档</a></p><blockquote>
+    <content><![CDATA[<h2 id="全文检索"><a href="#全文检索" class="headerlink" title="全文检索"></a>全文检索</h2><p><a href="https://django-haystack.readthedocs.io/en/v2.4.1/tutorial.html" target="_blank" rel="noopener">官方文档</a></p>
+<blockquote>
 <p>全文检索就是针对所有内容进行动态匹配搜索的概念</p>
 <p>针对特定的关键词进行<strong>建立索引</strong>并<strong>精确匹配</strong>取出搜索结果，并且达到性能优化的目的</p>
-</blockquote><a id="more"></a>
+</blockquote>
+<a id="more"></a>
 
 <ul>
 <li>为啥要有全文检索</li>
@@ -548,7 +749,11 @@
 <p>是一种动态性、弱类型的语言；</p>
 <p>他的解释器就在我们的浏览器中，是浏览器的一部分</p>
 <p>这门语言对<strong>大小写敏感</strong>，并会忽略多余的空格，可以使用<code>\</code>进行代码换行，注释使用<code>//</code>或<code>/**/</code></p>
-</blockquote><a id="more"></a>
+</blockquote>
+<a id="more"></a>
+
+
+
 <ul>
 <li>主要由三部分组成<ul>
 <li><code>ECMAScript</code>：语言的语法和基本对象</li>
@@ -1153,18 +1358,18 @@
   <entry>
     <title>时间模块</title>
     <url>/2017/08/06/%E6%97%B6%E9%97%B4%E6%A8%A1%E5%9D%97/</url>
-    <content><![CDATA[<h3 id="时间模块"><a href="#时间模块" class="headerlink" title="时间模块"></a>时间模块</h3><blockquote>
-<p>Python中有很多方便我们处理时间信息的模块</p>
+    <content><![CDATA[<h3 id="时间模块"><a href="#时间模块" class="headerlink" title="时间模块"></a>时间模块</h3><p>Python中有很多方便我们处理时间信息的模块</p>
 <ul>
 <li>*<em>time *</em>模块</li>
 <li><strong>datetime</strong> 模块</li>
 <li>*<em>pytz *</em>模块</li>
 <li>*<em>dateutil *</em>模块</li>
 </ul>
-</blockquote><a id="more"></a>
-<blockquote>
 <p>这里我们着重介绍的是前两种</p>
-</blockquote>
+<a id="more"></a>
+
+
+
 <h4 id="time模块"><a href="#time模块" class="headerlink" title="time模块"></a>time模块</h4><blockquote>
 <p><strong>time.time()</strong><br>返回当前时间于 <strong>Unix</strong>时间 <strong>(1970.1.1 00:00:00)</strong>经过的秒数<br>返回值也称作<strong>时间戳</strong>，是一个<strong>浮点数</strong>类型</p>
 </blockquote>
