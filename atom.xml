@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>渔夫的美好生活</title>
+  <title>LGZ BLOG</title>
   
-  <subtitle>记录美好生活</subtitle>
+  <subtitle>Action is the proper fruit of knowledge</subtitle>
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://xiaozhuang.tech/"/>
@@ -40,34 +40,6 @@
     
     
       <category term="Django" scheme="http://xiaozhuang.tech/tags/Django/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Mysql主从复制</title>
-    <link href="http://xiaozhuang.tech/2019/10/12/Mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/"/>
-    <id>http://xiaozhuang.tech/2019/10/12/Mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</id>
-    <published>2019-10-12T04:42:00.000Z</published>
-    <updated>2019-12-23T08:13:59.283Z</updated>
-    
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Mysql主从复制&quot;&gt;&lt;a href=&quot;#Mysql主从复制&quot; class=&quot;headerlink&quot; title=&quot;Mysql主从复制&quot;&gt;&lt;/a&gt;Mysql主从复制&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;什么是&lt;strong&gt;主从复制&lt;/strong&gt;？&lt;/li&gt;
-&lt;/ul&gt;
-&lt;blockquote&gt;
-&lt;p&gt;主从复制至少需要两台服务器，或两个&lt;strong&gt;mysql&lt;/strong&gt;服务，可以配置一主多从，多主多从&lt;/p&gt;
-&lt;p&gt;建立与某个业务数据库一样的数据库环境，即为主从复制&lt;/p&gt;
-&lt;p&gt;一般情况下，主库用以写，而从库用以读&lt;/p&gt;
-&lt;/blockquote&gt;
-    
-    </summary>
-    
-    
-      <category term="Mysql" scheme="http://xiaozhuang.tech/categories/Mysql/"/>
-    
-    
-      <category term="Mysql" scheme="http://xiaozhuang.tech/tags/Mysql/"/>
     
   </entry>
   
@@ -154,6 +126,28 @@
   </entry>
   
   <entry>
+    <title>Redis哨兵机制</title>
+    <link href="http://xiaozhuang.tech/2018/08/11/Redis%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/"/>
+    <id>http://xiaozhuang.tech/2018/08/11/Redis%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/</id>
+    <published>2018-08-11T01:22:13.000Z</published>
+    <updated>2019-12-24T13:31:39.342Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;Redis-哨兵机制&quot;&gt;&lt;a href=&quot;#Redis-哨兵机制&quot; class=&quot;headerlink&quot; title=&quot;Redis 哨兵机制&quot;&gt;&lt;/a&gt;Redis 哨兵机制&lt;/h1&gt;&lt;h3 id=&quot;什么是哨兵机制？&quot;&gt;&lt;a href=&quot;#什么是哨兵机制？&quot; class=&quot;headerlink&quot; title=&quot;什么是哨兵机制？&quot;&gt;&lt;/a&gt;什么是哨兵机制？&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Redis 的哨兵（sentinel）系统用于管理多个 Redis 服务器，&lt;strong&gt;哨兵是redis集群架构中非常重要的一个组件&lt;/strong&gt;，该系统执行以下三个任务：&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;
+    
+    </summary>
+    
+    
+      <category term="Redis" scheme="http://xiaozhuang.tech/categories/Redis/"/>
+    
+    
+      <category term="Redis哨兵机制" scheme="http://xiaozhuang.tech/tags/Redis%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Javascript</title>
     <link href="http://xiaozhuang.tech/2017/09/15/javascript/"/>
     <id>http://xiaozhuang.tech/2017/09/15/javascript/</id>
@@ -204,6 +198,81 @@
     
     
       <category term="Python" scheme="http://xiaozhuang.tech/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>用户和组</title>
+    <link href="http://xiaozhuang.tech/2017/06/06/%E7%94%A8%E6%88%B7%E5%92%8C%E7%BB%84/"/>
+    <id>http://xiaozhuang.tech/2017/06/06/%E7%94%A8%E6%88%B7%E5%92%8C%E7%BB%84/</id>
+    <published>2017-06-06T01:22:13.000Z</published>
+    <updated>2019-12-24T11:55:44.819Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;用户和组&quot;&gt;&lt;a href=&quot;#用户和组&quot; class=&quot;headerlink&quot; title=&quot;用户和组&quot;&gt;&lt;/a&gt;用户和组&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;Linux&lt;/code&gt;是一个多用户的操作系统，引入用户，可以更加方便管理&lt;code&gt;Linux&lt;/code&gt;服务器&lt;/p&gt;
+&lt;p&gt;系统默认需要以一个用户的身份登入，而且在系统上启动进程也需要以一个用户身份器运行，用户可以限制某些进程对特定资源的权限控制&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="Linux" scheme="http://xiaozhuang.tech/categories/Linux/"/>
+    
+    
+      <category term="Linux权限管理" scheme="http://xiaozhuang.tech/tags/Linux%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Mysql主从复制</title>
+    <link href="http://xiaozhuang.tech/2017/03/02/Mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/"/>
+    <id>http://xiaozhuang.tech/2017/03/02/Mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</id>
+    <published>2017-03-02T13:22:13.000Z</published>
+    <updated>2019-12-25T00:13:49.717Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Mysql主从复制&quot;&gt;&lt;a href=&quot;#Mysql主从复制&quot; class=&quot;headerlink&quot; title=&quot;Mysql主从复制&quot;&gt;&lt;/a&gt;Mysql主从复制&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;什么是&lt;strong&gt;主从复制&lt;/strong&gt;？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;主从复制至少需要两台服务器，或两个&lt;strong&gt;mysql&lt;/strong&gt;服务，可以配置一主多从，多主多从&lt;/p&gt;
+&lt;p&gt;建立与某个业务数据库一样的数据库环境，即为主从复制&lt;/p&gt;
+&lt;p&gt;一般情况下，主库用以写，而从库用以读&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="Mysql" scheme="http://xiaozhuang.tech/categories/Mysql/"/>
+    
+    
+      <category term="Mysql" scheme="http://xiaozhuang.tech/tags/Mysql/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Django邮件发送及华丽呼哨的邮件格式</title>
+    <link href="http://xiaozhuang.tech/2015/11/12/Django%E9%82%AE%E4%BB%B6%E5%8F%91%E9%80%81%E5%8F%8A%E5%8D%8E%E4%B8%BD%E5%91%BC%E5%93%A8%E7%9A%84%E9%82%AE%E4%BB%B6%E6%A0%BC%E5%BC%8F/"/>
+    <id>http://xiaozhuang.tech/2015/11/12/Django%E9%82%AE%E4%BB%B6%E5%8F%91%E9%80%81%E5%8F%8A%E5%8D%8E%E4%B8%BD%E5%91%BC%E5%93%A8%E7%9A%84%E9%82%AE%E4%BB%B6%E6%A0%BC%E5%BC%8F/</id>
+    <published>2015-11-12T13:22:13.000Z</published>
+    <updated>2019-12-25T00:14:24.981Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;发送邮件&quot;&gt;&lt;a href=&quot;#发送邮件&quot; class=&quot;headerlink&quot; title=&quot;发送邮件&quot;&gt;&lt;/a&gt;发送邮件&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;django&lt;/code&gt;中内置了许多方法可以使开发者方便的进行邮件发送&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="Django" scheme="http://xiaozhuang.tech/categories/Django/"/>
+    
+    
+      <category term="Django" scheme="http://xiaozhuang.tech/tags/Django/"/>
     
   </entry>
   

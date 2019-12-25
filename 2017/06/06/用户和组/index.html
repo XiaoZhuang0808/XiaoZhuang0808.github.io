@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="LGZ BLOG" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+
+  <meta name="description" content="用户和组 Linux是一个多用户的操作系统，引入用户，可以更加方便管理Linux服务器 系统默认需要以一个用户的身份登入，而且在系统上启动进程也需要以一个用户身份器运行，用户可以限制某些进程对特定资源的权限控制">
+<meta name="keywords" content="Linux权限管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用户和组">
+<meta property="og:url" content="http://xiaozhuang.tech/2017/06/06/用户和组/index.html">
+<meta property="og:site_name" content="LGZ BLOG">
+<meta property="og:description" content="用户和组 Linux是一个多用户的操作系统，引入用户，可以更加方便管理Linux服务器 系统默认需要以一个用户的身份登入，而且在系统上启动进程也需要以一个用户身份器运行，用户可以限制某些进程对特定资源的权限控制">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-24T11:55:44.819Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="用户和组">
+<meta name="twitter:description" content="用户和组 Linux是一个多用户的操作系统，引入用户，可以更加方便管理Linux服务器 系统默认需要以一个用户的身份登入，而且在系统上启动进程也需要以一个用户身份器运行，用户可以限制某些进程对特定资源的权限控制">
+
+<link rel="canonical" href="http://xiaozhuang.tech/2017/06/06/用户和组/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>用户和组 | LGZ BLOG</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LGZ BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Action is the proper fruit of knowledge</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaozhuang.tech/2017/06/06/用户和组/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cao.jpg">
+      <meta itemprop="name" content="Xiao Zhuang">
+      <meta itemprop="description" content="小试牛刀">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LGZ BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          用户和组
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-06-06 09:22:13" itemprop="dateCreated datePublished" datetime="2017-06-06T09:22:13+08:00">2017-06-06</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="用户和组"><a href="#用户和组" class="headerlink" title="用户和组"></a>用户和组</h2><blockquote>
+<p><code>Linux</code>是一个多用户的操作系统，引入用户，可以更加方便管理<code>Linux</code>服务器</p>
+<p>系统默认需要以一个用户的身份登入，而且在系统上启动进程也需要以一个用户身份器运行，用户可以限制某些进程对特定资源的权限控制</p>
+</blockquote><a id="more"></a>
+<h3 id="Linux用户及组"><a href="#Linux用户及组" class="headerlink" title="Linux用户及组"></a>Linux用户及组</h3><blockquote>
+<p><code>Linux</code>操作系统对多用户的管理，是非常繁琐的，所以用组的概念来管理用户就变得简单，每个用户可以在一个独立的组，每个组也可以有零个用户或者多个用户。</p>
+<p><code>Linux</code>系统用户是根据用户<code>ID</code>来识别的，默认<code>ID</code>长度为<code>32</code>位，从默认<code>ID</code>编号从<code>0</code>开始，但是为了和老式系统兼容，用户<code>ID</code>限制在<code>60000</code>以下，<code>Linux</code>用户分总共分为三种，分别如下</p>
+</blockquote>
+<ul>
+<li>超级用户：<code>root</code>，<code>ID</code>为0</li>
+<li>系统用户：<code>ID</code>从1到499</li>
+<li>普通用户：<code>ID</code>为500以上</li>
+</ul>
+<blockquote>
+<p><code>Linux</code>系统中的每个文件或者文件夹，都有一个所属用户及所属组</p>
+<p>使用<code>id</code>命令可以显示当前用户的信息，使用<code>passwd</code>命令可以修改当前用户密码。<code>Linux</code>操作系统用户的特点如下</p>
+</blockquote>
+<ul>
+<li>每个用户拥有一个<code>UserID</code>，操作系统实际读取的是<code>UID</code>，而非用户名；</li>
+<li>每个用户属于一个主组，属于一个或多个附属组，一个用户最多有<code>31</code>个附属组；</li>
+<li>每个组拥有一个<code>GroupID</code>；</li>
+<li>每个进程以一个用户身份运行，该用户可对进程拥有资源控制权限；</li>
+<li>每个可登陆用户拥有一个指定的<code>Shell</code>环境</li>
+</ul>
+<h3 id="Linux用户管理"><a href="#Linux用户管理" class="headerlink" title="Linux用户管理"></a>Linux用户管理</h3><blockquote>
+<p><code>Linux</code>用户在操作系统可以进行日常管理和维护，涉及到的相关配置文件如下</p>
+</blockquote>
+<ul>
+<li><code>/etc/passwd</code>：保存用户信息</li>
+<li><code>/etc/shadow</code>：保存用户密码（以加密形式保存）</li>
+<li><code>/etc/group</code>：保存组信息</li>
+<li><code>/etc/login.defs</code>：用户属性限制，密码过期时间，密码最大长度等限制</li>
+<li><code>/etc/default/useradd</code>：显示或更改默认的<code>useradd</code>配置文件</li>
+</ul>
+<h4 id="创建新用户"><a href="#创建新用户" class="headerlink" title="创建新用户"></a>创建新用户</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd usertest # 创建用户usertest</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>创建新用户，可以使用命令<code>useradd</code>，执行命令即可创建新用户</p>
+<p>同时会创建一个同名的组，默认该用户属于该用户组</p>
+</blockquote>
+<blockquote>
+<p>创建用户，会根据如下步骤进行操作</p>
+</blockquote>
+<ul>
+<li>在<code>/etc/passwd</code>文件中添加用户信息</li>
+<li>如使用<code>passwd</code>命令创建密码，密码会被加密保存在<code>/etc/shdaow</code>中</li>
+<li>为用户创建家目录：<code>/home/usertest</code>，创建目录操作应操作系统而异</li>
+<li>将<code>/etc/skel</code>中的<code>.bash</code>开头的文件复制至用户家目录</li>
+<li>创建与用户名相同的组，该用户默认属于这个同名组，组信息保存在<code>/etc/group</code>配置文件中</li>
+</ul>
+<blockquote>
+<p>其他命令可选参数如下所示</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-d # 指定新用户的主目录</span><br><span class="line">-G # 指定新用户的组列表</span><br><span class="line">-s # 新用户所使用的shell环境</span><br><span class="line">useradd usertest -s /bin/bash -d /home/usertest</span><br><span class="line"># 创建新用户usertest，指定shell环境为bash，主目录在/home/usertest</span><br></pre></td></tr></table></figure>
+
+<h4 id="删除用户"><a href="#删除用户" class="headerlink" title="删除用户"></a>删除用户</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">userdel # 保留用户的家目录</span><br><span class="line">userdel –r usertest # 删除用户及用户家目录，用户login系统无法删除</span><br><span class="line">userdel –rf usertest # 强制删除用户及该用户家目录，不论是否login系统</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当一个用户创建之后，我们可以通过<code>usermod</code>命令来修改用户及组的属性</p>
+</blockquote>
+<ul>
+<li><code>linux</code>下命令选项</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">选项：</span><br><span class="line">  -c, --comment 注释            GECOS 字段的新值</span><br><span class="line">  -d, --home HOME_DIR           用户的新主目录</span><br><span class="line">  -e, --expiredate EXPIRE_DATE  设定帐户过期的日期为 EXPIRE_DATE</span><br><span class="line">  -f, --inactive INACTIVE       过期 INACTIVE 天数后，设定密码为失效状态</span><br><span class="line">  -g, --gid GROUP               强制使用 GROUP 为新主组</span><br><span class="line">  -G, --groups GROUPS           新的附加组列表 GROUPS</span><br><span class="line">  -a, --append GROUP            将用户追加至上边 -G 中提到的附加组中，</span><br><span class="line">                                并不从其它组中删除此用户</span><br><span class="line">  -h, --help                    显示此帮助信息并推出</span><br><span class="line">  -l, --login LOGIN             新的登录名称</span><br><span class="line">  -L, --lock                    锁定用户帐号</span><br><span class="line">  -m, --move-home               将家目录内容移至新位置 (仅于 -d 一起使用)</span><br><span class="line">  -o, --non-unique              允许使用重复的(非唯一的) UID</span><br><span class="line">  -p, --password PASSWORD       将加密过的密码 (PASSWORD) 设为新密码</span><br><span class="line">  -R, --root CHROOT_DIR         chroot 到的目录</span><br><span class="line">  -s, --shell SHELL             该用户帐号的新登录 shell</span><br><span class="line">  -u, --uid UID                 用户帐号的新 UID</span><br><span class="line">  -U, --unlock                  解锁用户帐号</span><br><span class="line">  -Z, --selinux-user  SEUSER       用户账户的新 SELinux 用户映射</span><br><span class="line">groups username</span><br><span class="line"># 查看用户所属组</span><br></pre></td></tr></table></figure>
+
+<h4 id="修改用户所属组"><a href="#修改用户所属组" class="headerlink" title="修改用户所属组"></a>修改用户所属组</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">usermod usertest -G old_normal</span><br><span class="line"># 将用户usertest修改加入old_normal组中</span><br><span class="line">usermod usertest -a -G other_normal</span><br><span class="line"># 将用户追加至other_normal组中，且不影响原有组状态</span><br><span class="line">cat /etc/group | grep usertest </span><br><span class="line"># 可以查看到usertest用户当前所属组的情况</span><br></pre></td></tr></table></figure>
+
+<h4 id="修改用户家目录及启动shell"><a href="#修改用户家目录及启动shell" class="headerlink" title="修改用户家目录及启动shell"></a>修改用户家目录及启动shell</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usermod usertest -d /home/user -s /bin/sh</span><br></pre></td></tr></table></figure>
+
+<h4 id="修改用户名"><a href="#修改用户名" class="headerlink" title="修改用户名"></a>修改用户名</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">usermod -l new old</span><br><span class="line"># 将old用户名变为new</span><br></pre></td></tr></table></figure>
+
+<h4 id="锁定-解锁用户"><a href="#锁定-解锁用户" class="headerlink" title="锁定/解锁用户"></a>锁定/解锁用户</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">usermod -L usertest;</span><br><span class="line"># 锁定usertest用户</span><br><span class="line">usermod -U usertest;</span><br><span class="line"># 解锁usertest用户</span><br></pre></td></tr></table></figure>
+
+<h3 id="Linux组管理"><a href="#Linux组管理" class="headerlink" title="Linux组管理"></a>Linux组管理</h3><blockquote>
+<p>所有的<code>Linux</code>或者<code>Windows</code>系统都有组的概念，通过组可以更加方便的管理用户</p>
+<p>组的概念应用于各行行业，例如企业会使用部门、职能或地理区域的分类方式来管理成员，映射在<code>Linux</code>系统，同样可以创建用户，并用组的概念对其管理</p>
+<p>Linux组有如下特点</p>
+</blockquote>
+<ul>
+<li>每个组有一个组<code>ID</code></li>
+<li>组信息保存在<code>/etc/group</code>中</li>
+<li>每个用户至少拥有一个主组，同时还可以拥有<code>31</code>个附属组</li>
+</ul>
+<h4 id="创建新组"><a href="#创建新组" class="headerlink" title="创建新组"></a>创建新组</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">groupadd normal # 创建normal组</span><br><span class="line">groupadd -g 1000 normal # 创建ID为1000的分组</span><br></pre></td></tr></table></figure>
+
+<h4 id="其他组属性"><a href="#其他组属性" class="headerlink" title="其他组属性"></a>其他组属性</h4><blockquote>
+<p>常见参数</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-r # 系统账户</span><br><span class="line">-f # 如果指定的组已经存在，则退出</span><br><span class="line">-g # 指定当前组id</span><br><span class="line">-n --new --old # 修改组名</span><br><span class="line">groupmod -n old_normal normal</span><br><span class="line"># 修改normal组名为old_normal</span><br><span class="line">groupmod -g 1001 old_normal</span><br><span class="line"># 修改old_normal组id为1001</span><br></pre></td></tr></table></figure>
+
+<h2 id="权限"><a href="#权限" class="headerlink" title="权限"></a>权限</h2><blockquote>
+<p>设置好了用户和组，那么接下来就可以对其进行权限控制</p>
+<p>由于linux下处处皆文件，所谓权限也就是对文件的<strong>读</strong>、<strong>写</strong>、<strong>执行</strong>，至少这三种</p>
+<p>当操作系统下某个进程在运行时，进程的权限，也相当于这个进程的运行用户身份权限</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">权限</th>
+<th align="left">文件</th>
+<th align="left">目录</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">r</td>
+<td align="left">读取文件</td>
+<td align="left">列出目录</td>
+</tr>
+<tr>
+<td align="left">w</td>
+<td align="left">修改文件</td>
+<td align="left">修改目录内文件</td>
+</tr>
+<tr>
+<td align="left">x</td>
+<td align="left">执行文件</td>
+<td align="left">进入目录</td>
+</tr>
+</tbody></table>
+<ul>
+<li>权限分组</li>
+</ul>
+<blockquote>
+<p>默认的linux的权限分为三种角色</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; user`、`group`、`other</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>每个文件将基于<strong>UGO</strong>三种权限进行设置</p>
+<p>一般一个文件创建之后，谁创建该文件，默认成为该文件的所有者</p>
+</blockquote>
+<h3 id="用户及组权限"><a href="#用户及组权限" class="headerlink" title="用户及组权限"></a>用户及组权限</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ls -ahl</span><br><span class="line"># 查看文件所有者</span><br><span class="line">chmod g+rwx file</span><br><span class="line"># 给file文件增加rwx权限</span><br><span class="line">chmod g-x file</span><br><span class="line"># 给file文件减少x权限</span><br></pre></td></tr></table></figure>
+
+<h3 id="用户及组修改"><a href="#用户及组修改" class="headerlink" title="用户及组修改"></a>用户及组修改</h3><blockquote>
+<p>修改某个文件或目录所属<strong>用户</strong>或<strong>组</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">chown -R root file</span><br><span class="line"># 修改file文件所属用户为root</span><br><span class="line">chown -R :root file</span><br><span class="line"># 修改file文件所属用户为root</span><br><span class="line">chgrp -R root file</span><br><span class="line"># 修改file文件所属组为root</span><br></pre></td></tr></table></figure>
+
+<h3 id="二进制权限"><a href="#二进制权限" class="headerlink" title="二进制权限"></a>二进制权限</h3><blockquote>
+<p>linux下具备权限设置为1，反之为0，那么一个权限按照二进制位数来计算，如下所示</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">--x: 001 1</span><br><span class="line">-wx: 011 3</span><br><span class="line">rwx: 111 7</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>很清晰，对应的权限位置所代表的数字分别是：<strong>r=4</strong>，<strong>w=2</strong>，<strong>x=1</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">chmod 775 file</span><br><span class="line"># 修改file文件权限为 rwxrwxr-x</span><br></pre></td></tr></table></figure>
+
+<h3 id="权限掩码"><a href="#权限掩码" class="headerlink" title="权限掩码"></a>权限掩码</h3><blockquote>
+<p>神奇的事情需要我们考虑，每次创建文件，默认都会具备一定的权限，而这个权限是如何分配而来的呢？</p>
+<p>是通过一个叫做权限掩码的东西来维护的，这个码可以通过<strong>umask</strong>命令看到</p>
+<p>默认系统的掩码是<strong>022</strong></p>
+</blockquote>
+<ul>
+<li>文件权限由默认权限减去掩码</li>
+</ul>
+<blockquote>
+<p>文件默认权限：666<br>那么创建一个文件真实的权限是：666-022=644</p>
+</blockquote>
+<blockquote>
+<p>目录的默认权限：777</p>
+<p>一个目录的真实权限是：777-022=755</p>
+</blockquote>
+<ul>
+<li>设置默认掩码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umask -S 011</span><br></pre></td></tr></table></figure>
+
+<h3 id="特殊权限"><a href="#特殊权限" class="headerlink" title="特殊权限"></a>特殊权限</h3><table>
+<thead>
+<tr>
+<th align="left">权限</th>
+<th align="left">对文件的影响</th>
+<th align="left">对目录的影响</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>suid</strong></td>
+<td align="left">以文件的所属用户身份执行，而非执行文件的用户</td>
+<td align="left">无</td>
+</tr>
+<tr>
+<td align="left"><strong>sgid</strong></td>
+<td align="left">以文件所属组身份去执行</td>
+<td align="left">在该目录中创建任意新文件的所属组与该目录的所属组相同</td>
+</tr>
+<tr>
+<td align="left"><strong>sticky</strong></td>
+<td align="left">无</td>
+<td align="left">对目录拥有写入权限的用户仅可以删除其拥有的文件，无法删除其他用户所拥有的文件</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xiao Zhuang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaozhuang.tech/2017/06/06/用户和组/" title="用户和组">http://xiaozhuang.tech/2017/06/06/用户和组/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <div>
+        
+          <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+        
+      </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux权限管理/" rel="tag"># Linux权限管理</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2017/03/02/Mysql主从复制/" rel="next" title="Mysql主从复制">
+                  <i class="fa fa-chevron-left"></i> Mysql主从复制
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2017/08/06/时间模块/" rel="prev" title="时间模块">
+                  时间模块 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#用户和组"><span class="nav-text">用户和组</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux用户及组"><span class="nav-text">Linux用户及组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux用户管理"><span class="nav-text">Linux用户管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建新用户"><span class="nav-text">创建新用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#删除用户"><span class="nav-text">删除用户</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改用户所属组"><span class="nav-text">修改用户所属组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改用户家目录及启动shell"><span class="nav-text">修改用户家目录及启动shell</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改用户名"><span class="nav-text">修改用户名</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#锁定-解锁用户"><span class="nav-text">锁定/解锁用户</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux组管理"><span class="nav-text">Linux组管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建新组"><span class="nav-text">创建新组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#其他组属性"><span class="nav-text">其他组属性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#权限"><span class="nav-text">权限</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用户及组权限"><span class="nav-text">用户及组权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#用户及组修改"><span class="nav-text">用户及组修改</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二进制权限"><span class="nav-text">二进制权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#权限掩码"><span class="nav-text">权限掩码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特殊权限"><span class="nav-text">特殊权限</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Xiao Zhuang"
+    src="/images/cao.jpg">
+  <p class="site-author-name" itemprop="name">Xiao Zhuang</p>
+  <div class="site-description" itemprop="description">小试牛刀</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" title="GitHub &rarr; https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1624611910@qq.com" title="E-Mail &rarr; mailto:1624611910@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://cy-blogs.cn" title="https://cy-blogs.cn" rel="noopener" target="_blank">laochen</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://v3u.cn/" title="https://v3u.cn/" rel="noopener" target="_blank">悦哥</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘国壮</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,0' opacity='0.5' zIndex='-1' count='150' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.2"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

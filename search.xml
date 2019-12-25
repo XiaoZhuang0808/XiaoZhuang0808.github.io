@@ -38,150 +38,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Mysql主从复制</title>
-    <url>/2019/10/12/Mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</url>
-    <content><![CDATA[<h2 id="Mysql主从复制"><a href="#Mysql主从复制" class="headerlink" title="Mysql主从复制"></a>Mysql主从复制</h2><ul>
-<li>什么是<strong>主从复制</strong>？</li>
-</ul>
-<blockquote>
-<p>主从复制至少需要两台服务器，或两个<strong>mysql</strong>服务，可以配置一主多从，多主多从</p>
-<p>建立与某个业务数据库一样的数据库环境，即为主从复制</p>
-<p>一般情况下，主库用以写，而从库用以读</p>
-</blockquote>
-<a id="more"></a>
-
-<ul>
-<li>为什么要搭建主从复制？<ol>
-<li>构建主从热备，当某天数据库宕机或或数据丢失情况，可以有备份数据库继续工作</li>
-<li>降低IO频次，多库之间可以合理分配读写压力，提高单个数据库服务的数据库访问压力</li>
-<li>隔离读写，在某些锁表情况下，可以使数据库读操作继续进行</li>
-</ol>
-</li>
-</ul>
-<ul>
-<li>主从复制原理</li>
-</ul>
-<blockquote>
-<p>利用数据库<strong>bin-log</strong>二进制文件，该文件包含有数据库操作的所有SQL语句</p>
-<p>复制该文件至其余数据库服务中并执行即可</p>
-</blockquote>
-<ul>
-<li><p>主从复制过程</p>
-<ol>
-<li><p>当主库具有新数据时，主库会被从库请求，建立线程进行连接，用以传输<strong>binlog</strong>日志</p>
-</li>
-<li><p>从库开启两个线程</p>
-<blockquote>
-<p>A线程：也叫做<strong>IO线程</strong>，连接主库，并请求binlog中的更新记录至从库中，写入至从库的<strong>relaylog</strong>文件中</p>
-<p>B线程：也叫做<strong>SQL线程</strong>，读取<strong>relaylog</strong>文件中的更新操作并执行</p>
-</blockquote>
-</li>
-<li><p>如果，有多个从库同时存在，主库会为每个从库建立一个<strong>binlog</strong>输出线程</p>
-</li>
-</ol>
-</li>
-</ul>
-<p><a href="https://lienze.tech/blog/images/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8E%9F%E7%90%86%E8%87%AA%E7%BB%98.png" target="_blank" rel="noopener"><img src="https://lienze.tech/blog/images/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8E%9F%E7%90%86%E8%87%AA%E7%BB%98.png" alt="主从复制原理自绘"></a></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">set global validate_password_policy=LOW;</span><br><span class="line">set global validate_password_length=6;</span><br></pre></td></tr></table></figure>
-
-<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><blockquote>
-<p>此处以一主一丛为例</p>
-</blockquote>
-<ul>
-<li>系统环境<ul>
-<li>主库（master）：192.168.1.100</li>
-<li>从库（slave）：192.168.1.101</li>
-</ul>
-</li>
-</ul>
-<h3 id="主库修改"><a href="#主库修改" class="headerlink" title="主库修改"></a>主库修改</h3><ul>
-<li>主库配置修改</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">server-id = 1</span><br><span class="line">log-bin=mysql-bin # 开启log bin</span><br><span class="line">expire_logs_days=7 # 日志保存时间</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p><strong>server-id</strong>：</p>
-<p>同步数据中必须包含<strong>server-id</strong>，用于标识该语句最初是从哪个<strong>server</strong>写入</p>
-<p>每个<strong>slave</strong>端只能有一个线程在<strong>master</strong>端连接，如果两个<strong>salve</strong>端的<strong>server-id</strong>一致，一个连接成功之后，前一个连接将会被断开</p>
-<p>主主同步时，避免数据同步陷入死循环</p>
-</blockquote>
-<ul>
-<li>主库创建用户，用以从机连接获取<strong>binlog</strong>日志</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant replication slave on *.* to &apos;master&apos;@&apos;%&apos; identified by &apos;123456&apos;;</span><br><span class="line">flush privileges;</span><br><span class="line">grant all privileges on *.* to master@&apos;%&apos; identified by &quot;123456&quot;;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>查看master状态（包括日志文件名和对应位置）</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show master status;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>记录上条命令返回的<strong>binlog</strong>文件名，<strong>Position</strong>属性，从机连接的时候要用</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+------------------+----------+--------------+------------------+-------------------+</span><br><span class="line">| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |</span><br><span class="line">+------------------+----------+--------------+------------------+-------------------+</span><br><span class="line">| mysql-bin.000001 |      154 |              |                  |                   |</span><br><span class="line">+------------------+----------+--------------+------------------+-------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
-
-<h3 id="从库修改"><a href="#从库修改" class="headerlink" title="从库修改"></a>从库修改</h3><ul>
-<li>从库配置修改</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">server-id=11</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p><strong>master</strong>与<strong>slave</strong>端的<strong>server-id</strong>不能一样</p>
-<p><strong>salve</strong>端无需开启<strong>log-bin</strong>功能</p>
-</blockquote>
-<ul>
-<li>从库指定master，执行如下</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">change master to master_host=&apos;118.31.76.26&apos;, master_port=3306, master_user=&apos;master&apos;, master_password=&apos;123456&apos;, master_log_file=&apos;mysql-bin.000001&apos;, master_log_pos=603;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>启动从机</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">start slave;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>从机连接停止（配置错误，从新连接时使用）</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">stop slave;</span><br><span class="line">reset slave all;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>查询连接状态</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show slave status \G;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>显示为正确</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">*************************** 1. row ***************************</span><br><span class="line">Slave_IO_State: Waiting for master to send event</span><br><span class="line">Master_Host: 192.168.1.9</span><br><span class="line">Master_User: reader</span><br><span class="line">Master_Port: 3307</span><br><span class="line">Connect_Retry: 60</span><br><span class="line">Master_Log_File: mysql-bin.000007</span><br><span class="line">Read_Master_Log_Pos: 501</span><br><span class="line">Relay_Log_File: 0b763a8d1ddd-relay-bin.000002</span><br><span class="line">Relay_Log_Pos: 320</span><br><span class="line">Relay_Master_Log_File: mysql-bin.000007</span><br><span class="line">Slave_IO_Running: Yes</span><br><span class="line">Slave_SQL_Running: Yes</span><br><span class="line">Last_IO_Error: 错误显示地方</span><br></pre></td></tr></table></figure>
-
-<p>###项目配置</p>
-<h4 id="settings-py文件"><a href="#settings-py文件" class="headerlink" title="settings.py文件"></a>settings.py文件</h4><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">DATABASES = &#123;</span><br><span class="line">	<span class="string">'default'</span>: &#123;</span><br><span class="line">		<span class="string">'ENGINE'</span>: <span class="string">'django.db.backends.mysql'</span>,</span><br><span class="line">		<span class="string">'HOST'</span>: <span class="string">'118.31.76.26'</span>, <span class="comment"># 数据库主机</span></span><br><span class="line">		<span class="string">'PORT'</span>: <span class="number">3306</span>, <span class="comment"># 数据库端口</span></span><br><span class="line">		<span class="string">'USER'</span>: <span class="string">'root'</span>, <span class="comment"># 数据库用户名</span></span><br><span class="line">		<span class="string">'PASSWORD'</span>: <span class="string">'123456'</span>, <span class="comment"># 数据库用户密码</span></span><br><span class="line">		<span class="string">'NAME'</span>: <span class="string">'slave'</span> <span class="comment"># 数据库名字</span></span><br><span class="line">	&#125;,</span><br><span class="line">    <span class="string">'slave'</span>: &#123;</span><br><span class="line">		<span class="string">'ENGINE'</span>: <span class="string">'django.db.backends.mysql'</span>,</span><br><span class="line">		<span class="string">'HOST'</span>: <span class="string">'118.31.76.26'</span>, <span class="comment"># 数据库主机</span></span><br><span class="line">		<span class="string">'PORT'</span>: <span class="number">3307</span>, <span class="comment"># 数据库端口</span></span><br><span class="line">		<span class="string">'USER'</span>: <span class="string">'root'</span>, <span class="comment"># 数据库用户名</span></span><br><span class="line">		<span class="string">'PASSWORD'</span>: <span class="string">'123456'</span>, <span class="comment"># 数据库用户密码</span></span><br><span class="line">		<span class="string">'NAME'</span>: <span class="string">'slave'</span> <span class="comment"># 数据库名字</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">DATABASES_ROUTERS= [<span class="string">'slave.utils.DBrouter'</span>]</span><br></pre></td></tr></table></figure>
-
-<h4 id="主路由下utils-py"><a href="#主路由下utils-py" class="headerlink" title="主路由下utils.py"></a>主路由下utils.py</h4><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DBrouter</span>:</span></span><br><span class="line">    <span class="string">"""数据库主从读写分离路由"""</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db_for_read</span><span class="params">(self,model,**hints)</span>:</span></span><br><span class="line">        <span class="string">"""读数据库"""</span></span><br><span class="line">        print(<span class="string">'给从'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'slave'</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db_for_write</span><span class="params">(self,model,**hints)</span>:</span></span><br><span class="line">        <span class="string">"""写数据库"""</span></span><br><span class="line">        print(<span class="string">'给主'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'default'</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">allow_relation</span><span class="params">(self,db1,db2,**k)</span>:</span></span><br><span class="line">        <span class="string">"""是否运行关联操作"""</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="同步特定的库"><a href="#同步特定的库" class="headerlink" title="同步特定的库"></a>同步特定的库</h3><h4 id="主机处配置"><a href="#主机处配置" class="headerlink" title="主机处配置"></a>主机处配置</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">binlog-do-db=xxxx   # 二进制日志记录的数据库</span><br><span class="line">binlog-ignore-db=xxxx # 二进制日志中忽略数据库</span><br></pre></td></tr></table></figure>
-
-<h4 id="从机处配置"><a href="#从机处配置" class="headerlink" title="从机处配置"></a>从机处配置</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">replicate-do-db    # 设定需要复制的数据库</span><br><span class="line">replicate-ignore-db # 设定需要忽略的复制数据库</span><br><span class="line">replicate-do-table  # 设定需要复制的表</span><br><span class="line">replicate-ignore-table # 设定需要忽略的复制表</span><br><span class="line">replicate-wild-do-table # 同replication-do-table功能一样，但是可以通配符</span><br><span class="line">replicate-wild-ignore-table # 同replication-ignore-table功能一样，但是可以加通配符</span><br></pre></td></tr></table></figure>
-
-<h3 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h3><ul>
-<li><strong>mysql</strong>-&gt;<strong>mariadb</strong>版本问题</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Last_IO_Error: Got fatal error 1236 from master when reading data from binary log: &apos;Client requested master to start replication from position &gt; file size&apos;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>从<strong>MySQL5.6</strong>开始引入了<strong>binlog_checksum</strong>全局变量，即<strong>MySQL</strong>会将<strong>event</strong>的<strong>CRC32</strong>校验值也写入<strong>binlog</strong>，显然<strong>MariaDB</strong>在分析日志的时候不会考虑该信息，导致解析出错</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show variables like &apos;%binlog%&apos;;</span><br><span class="line">set global binlog_checksum=NONE;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>Mysql</category>
-      </categories>
-      <tags>
-        <tag>Mysql</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>OS模块</title>
     <url>/2019/03/04/OS%E6%A8%A1%E5%9D%97/</url>
     <content><![CDATA[<h3 id="OS模块"><a href="#OS模块" class="headerlink" title="OS模块"></a>OS模块</h3><blockquote>
@@ -739,6 +595,122 @@
       </categories>
       <tags>
         <tag>Django</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Redis哨兵机制</title>
+    <url>/2018/08/11/Redis%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<h1 id="Redis-哨兵机制"><a href="#Redis-哨兵机制" class="headerlink" title="Redis 哨兵机制"></a>Redis 哨兵机制</h1><h3 id="什么是哨兵机制？"><a href="#什么是哨兵机制？" class="headerlink" title="什么是哨兵机制？"></a>什么是哨兵机制？</h3><ul>
+<li><p>Redis 的哨兵（sentinel）系统用于管理多个 Redis 服务器，<strong>哨兵是redis集群架构中非常重要的一个组件</strong>，该系统执行以下三个任务：</p>
+<a id="more"></a>
+
+<ul>
+<li><strong>监控（Monitoring）</strong>：哨兵（sentinel）会不断地检查你的 Master 和Slave 是否运作正常。</li>
+<li><strong>提醒（Notification）</strong>：当别监控的某个 Redis 出现问题时，哨兵（sentinel）可以通过 API 向管理员或者其他应用程序发送通知。</li>
+<li><strong>自动故障迁移（Automatic failover）</strong>：当一个Master 不能正常工作时，哨兵（sentinel）会开始一次自动故障迁移操作，它会将失效 Master 的其中一个 Slave 升级为新的 Master，并让失效 Master 的其他 Slave 改为复制新的 Master；当客户端视图连接失败的 Master时，集群也会向客户端返回新 Master 的地址，使得集群可以使用 Master 代替失效 Master。</li>
+</ul>
+</li>
+<li><p><strong>哨兵（sentinel）是一个分布式系统，作为一个哨兵集群去运行的，相互协同工作，你可以在一个架构中运行多个哨兵（sentinel）进程</strong></p>
+<blockquote>
+<p>​        (1)故障转移时，判断一个master node宕机了，需要大部分哨兵都同意才行，涉及到分布式选举问题。<br>​         (2)及时部分哨兵节点挂掉了，哨兵集群还是能正常工作的，因为如果一个作为高可用机制重要组成部分的故障转移系统本身就是单点，那么就不靠谱。        </p>
+<p>​        这些进程使用留言协议（gossipprotocols）来接收关于Master 是否下线的信息，并使用投票协议 （agreementprotocols）来决定是否执行自动故障迁移，以及选择哪个 Slave 作为新的 Master。</p>
+<p>​        每个哨兵（sentinel）会向其它哨兵（sentinel）、master、slave<strong>定时</strong>发送消息，以确认对方是否 <strong>“活“ **着，如果发现对方在指定时间（可配置）内未响应，则暂时认为对方已挂（所谓的</strong>”主观认为冗机“**Subjective Down,简称sdown)）</p>
+<p>​        若<strong>“哨兵群”</strong>中的多数据sentinel，都报告某一 master 没响应，系统才认为该 master <strong>“彻底死亡”</strong>(即:客观上的真正down机,Objective Down,简称odown),通过一定的vote算法,从剩下的slave节点中,选一台提升为master,然后自动修改相关配置。</p>
+<p>​         虽然<strong>哨兵(sentinel) *<em>释出为一个单独的可执行文件 *</em>redis-sentinel **,但实际上它只是一个运行在特殊模式下的 Redis 服务器，你可以在启动一个普通 Redis 服务器时通过给定</strong> –sentinel** 选项来启动<strong>哨兵(sentinel)</strong>。</p>
+</blockquote>
+<p>​         哨兵(sentinel) 的一些设计思路和zookeeper非常类似</p>
+<p><img src="/2018/08/11/Redis哨兵机制/20171004163652928.jpg" alt></p>
+</li>
+</ul>
+<h3 id="哨兵的核心知识"><a href="#哨兵的核心知识" class="headerlink" title="哨兵的核心知识"></a>哨兵的核心知识</h3><hr>
+<ul>
+<li><p>哨兵至少需要3个实例，来保证自己的健壮性。</p>
+</li>
+<li><p>哨兵+redis主从的部署架构，是不会保证数据零丢失的，只能保证redis集群的高可用性</p>
+</li>
+<li><p>对于哨兵+redis主从这种复杂的部署架构，尽量在测试环境和生产环境，都进行充分的测试和演练。</p>
+</li>
+</ul>
+<h3 id="redis哨兵主备切换的数据丢失问题"><a href="#redis哨兵主备切换的数据丢失问题" class="headerlink" title="redis哨兵主备切换的数据丢失问题"></a>redis哨兵主备切换的数据丢失问题</h3><hr>
+<p>两种丢失情况：</p>
+<ul>
+<li><p>异步复制导致的数据丢失</p>
+<blockquote>
+<p>​        因为master-&gt;slave的复制是异步的，所 以可能有部分数据还没复制到slave，master就宕机了，这些数据就丢失了。</p>
+</blockquote>
+</li>
+<li><p>脑裂导致的数据丢失</p>
+<blockquote>
+<p>​        脑裂，也就是说，某个master所在机器 突然脱离了正常的网络，跟其他slave机器不能连接，但是实际上master还运行着<br> ​        这个时候，集群中就会出现两个master。<br> ​        此时虽然某个slave被切换成了master，但是可能client还没来得及切换到新的master，还继续写向旧master数据可能就会丢失。<br> ​        因此master在恢复的时候，会被作为一个slave挂到新的master上，自己的数据会被清空，从新的master复制数据</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="解决异步复制和脑裂导致的数据丢失"><a href="#解决异步复制和脑裂导致的数据丢失" class="headerlink" title="解决异步复制和脑裂导致的数据丢失"></a>解决异步复制和脑裂导致的数据丢失</h3><hr>
+<p>min-slaves-to-write 1<br> min-slaves-max-lag 10<br> 要求至少有1个slave，数据复制和同步的延迟不能超过10秒<br> 如果说一旦所有slave，数据复制和同步的延迟都超过了10秒钟，那么这个时候，master就不会再接收任何请求了。<br> （1）减少异步复制的数据丢失<br> 有了min-slaves-max-lag这个配置，就可以确保说，一旦slave复制数据和ack延时太长，就认为可能master宕机后损失的数据太多了，那么就拒绝写请求，这样可以把master宕机时由于部分数据未同步到slave导致的数据丢失降低的可控范围内<br> （2）减少脑裂的数据丢失<br> 如果一个master出现了脑裂，跟其他slave丢了连接，那么上面两个配置可以确保说，如果不能继续给指定数量的slave发送数据，而且slave超过10秒没有给自己ack消息，那么就直接拒绝客户端的写请求<br> 这样脑裂后的旧master就不会接受client的新数据，也就避免了数据丢失<br> 上面的配置就确保了，如果跟任何一个slave丢了连接，在10秒后发现没有slave给自己ack，那么就拒绝新的写请求<br> 因此在脑裂场景下，最多就丢失10秒的数据</p>
+<p><img src="/2018/08/11/Redis哨兵机制/%E8%84%91%E8%A3%82%E9%97%AE%E9%A2%98.jpg" alt></p>
+<p>集群脑裂导致的数据丢失问题.png</p>
+<p><img src="/2018/08/11/Redis哨兵机制/160983038536.jpg" alt></p>
+<p>脑裂导致数据丢失的问题如何降低损失.png</p>
+<p><img src="/2018/08/11/Redis哨兵机制/16098303.jpg" alt></p>
+<p>异步复制导致的数据丢失问题.png</p>
+<p><img src="/2018/08/11/Redis哨兵机制/16098303d31754.jpg" alt></p>
+<h3 id="哨兵模式的配置修改"><a href="#哨兵模式的配置修改" class="headerlink" title="哨兵模式的配置修改"></a>哨兵模式的配置修改</h3><hr>
+<ul>
+<li>实现步骤<ul>
+<li>拷贝到etc目录<ul>
+<li><strong>cp sentinel.conf /usr/local/redis/etc</strong></li>
+</ul>
+</li>
+<li>修改sentinel.conf配置文件<ul>
+<li><strong>sentinel monitor mymast 192.168.110.133 6379 1</strong> #主节点 名称 IP 端口号 选举次数</li>
+<li>#配置主服务器的密码(如没设置密码，可以省略)<br>  <strong>sentinel auth-pass mymaster 123456</strong> </li>
+</ul>
+</li>
+<li>修改心跳检测 5000毫秒<ul>
+<li><strong>sentinel down-after-milliseconds mymaster 5000</strong></li>
+</ul>
+</li>
+<li>做多多少合格节点<ul>
+<li><strong>sentinel parallel-syncs mymaster 2</strong></li>
+</ul>
+</li>
+<li>启动哨兵模式<ul>
+<li><strong>./redis-server /usr/local/redis/etc/sentinel.conf –sentinel &amp;</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>注意：</p>
+<p>1.当启动哨兵模式之后，如果你的master服务器宕机之后，哨兵自动会在从redis服务器里面 投票选举一个master主服务器出来；这个主服务器也可以进行<strong>读写</strong>操作！</p>
+<p>2.如果之前宕机的主服务器已经修好，可以正式运行了。那么这个服务器只能进行<strong>读</strong>的操作，会自动跟随由哨兵选举出来的新服务器！</p>
+<p>3.大家可以进入./redis-cli，输入<strong>info，</strong>查看你的状态信息；</p>
+</blockquote>
+<p><img src="/2018/08/11/Redis哨兵机制/20171004170405127.jpg" alt></p>
+<h3 id="哨兵-Sentinel-总结"><a href="#哨兵-Sentinel-总结" class="headerlink" title="哨兵(Sentinel)总结"></a>哨兵(Sentinel)总结</h3><blockquote>
+<p>1、<strong>Sentinel</strong>的作用：</p>
+<p>A、Master 状态监测</p>
+<p>B、如果Master 异常，则会进行Master-slave 转换，将其中一个Slave作为Master，将之前的Master作为Slave </p>
+<p>C、Master-Slave切换后，master_redis.conf、slave_redis.conf和sentinel.conf的内容都会发生改变，即master_redis.conf中会多一行slaveof的配置，sentinel.conf的监控目标会随之调换 </p>
+<p>2、<strong>Sentinel</strong>的工作方式<strong>:</strong></p>
+<p>1)：每个Sentinel以每秒钟一次的频率向它所知的Master，Slave以及其他 Sentinel 实例发送一个 PING 命令。</p>
+<p>2)：如果一个实例（instance）距离最后一次有效回复 PING 命令的时间超过 down-after-milliseconds 选项所指定的值， 则这个实例会被 Sentinel 标记为主观下线。 </p>
+<p>3)：如果一个Master被标记为主观下线，则正在监视这个Master的所有 Sentinel 要以每秒一次的频率确认Master的确进入了主观下线状态。 </p>
+<p>4)：当有足够数量的 Sentinel（大于等于配置文件指定的值）在指定的时间范围内确认Master的确进入了主观下线状态， 则Master会被标记为客观下线 。</p>
+<p>5)：在一般情况下， 每个 Sentinel 会以每 10 秒一次的频率向它已知的所有Master，Slave发送 INFO 命令 。</p>
+<p>6)：当Master被 Sentinel 标记为客观下线时，Sentinel 向下线的 Master 的所有 Slave 发送 INFO 命令的频率会从 10 秒一次改为每秒一次 。</p>
+<p>7)：若没有足够数量的 Sentinel 同意 Master 已经下线， Master 的客观下线状态就会被移除。 </p>
+<p>若 Master 重新向 Sentinel 的 PING 命令返回有效回复， Master 的主观下线状态就会被移除。</p>
+<p>最后，如果大家看不太懂，推荐大家看两个博客，就明白了！</p>
+<p>1.<a href="http://blog.csdn.net/zbw18297786698/article/details/52891695" target="_blank" rel="noopener">http://blog.csdn.net/zbw18297786698/article/details/52891695</a><br>2.<a href="http://blog.csdn.net/candy_rainbow/article/details/52842402" target="_blank" rel="noopener">http://blog.csdn.net/candy_rainbow/article/details/52842402</a>    </p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Redis</category>
+      </categories>
+      <tags>
+        <tag>Redis哨兵机制</tag>
       </tags>
   </entry>
   <entry>
@@ -1540,6 +1512,473 @@
       </categories>
       <tags>
         <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>用户和组</title>
+    <url>/2017/06/06/%E7%94%A8%E6%88%B7%E5%92%8C%E7%BB%84/</url>
+    <content><![CDATA[<h2 id="用户和组"><a href="#用户和组" class="headerlink" title="用户和组"></a>用户和组</h2><blockquote>
+<p><code>Linux</code>是一个多用户的操作系统，引入用户，可以更加方便管理<code>Linux</code>服务器</p>
+<p>系统默认需要以一个用户的身份登入，而且在系统上启动进程也需要以一个用户身份器运行，用户可以限制某些进程对特定资源的权限控制</p>
+</blockquote><a id="more"></a>
+<h3 id="Linux用户及组"><a href="#Linux用户及组" class="headerlink" title="Linux用户及组"></a>Linux用户及组</h3><blockquote>
+<p><code>Linux</code>操作系统对多用户的管理，是非常繁琐的，所以用组的概念来管理用户就变得简单，每个用户可以在一个独立的组，每个组也可以有零个用户或者多个用户。</p>
+<p><code>Linux</code>系统用户是根据用户<code>ID</code>来识别的，默认<code>ID</code>长度为<code>32</code>位，从默认<code>ID</code>编号从<code>0</code>开始，但是为了和老式系统兼容，用户<code>ID</code>限制在<code>60000</code>以下，<code>Linux</code>用户分总共分为三种，分别如下</p>
+</blockquote>
+<ul>
+<li>超级用户：<code>root</code>，<code>ID</code>为0</li>
+<li>系统用户：<code>ID</code>从1到499</li>
+<li>普通用户：<code>ID</code>为500以上</li>
+</ul>
+<blockquote>
+<p><code>Linux</code>系统中的每个文件或者文件夹，都有一个所属用户及所属组</p>
+<p>使用<code>id</code>命令可以显示当前用户的信息，使用<code>passwd</code>命令可以修改当前用户密码。<code>Linux</code>操作系统用户的特点如下</p>
+</blockquote>
+<ul>
+<li>每个用户拥有一个<code>UserID</code>，操作系统实际读取的是<code>UID</code>，而非用户名；</li>
+<li>每个用户属于一个主组，属于一个或多个附属组，一个用户最多有<code>31</code>个附属组；</li>
+<li>每个组拥有一个<code>GroupID</code>；</li>
+<li>每个进程以一个用户身份运行，该用户可对进程拥有资源控制权限；</li>
+<li>每个可登陆用户拥有一个指定的<code>Shell</code>环境</li>
+</ul>
+<h3 id="Linux用户管理"><a href="#Linux用户管理" class="headerlink" title="Linux用户管理"></a>Linux用户管理</h3><blockquote>
+<p><code>Linux</code>用户在操作系统可以进行日常管理和维护，涉及到的相关配置文件如下</p>
+</blockquote>
+<ul>
+<li><code>/etc/passwd</code>：保存用户信息</li>
+<li><code>/etc/shadow</code>：保存用户密码（以加密形式保存）</li>
+<li><code>/etc/group</code>：保存组信息</li>
+<li><code>/etc/login.defs</code>：用户属性限制，密码过期时间，密码最大长度等限制</li>
+<li><code>/etc/default/useradd</code>：显示或更改默认的<code>useradd</code>配置文件</li>
+</ul>
+<h4 id="创建新用户"><a href="#创建新用户" class="headerlink" title="创建新用户"></a>创建新用户</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">useradd usertest # 创建用户usertest</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>创建新用户，可以使用命令<code>useradd</code>，执行命令即可创建新用户</p>
+<p>同时会创建一个同名的组，默认该用户属于该用户组</p>
+</blockquote>
+<blockquote>
+<p>创建用户，会根据如下步骤进行操作</p>
+</blockquote>
+<ul>
+<li>在<code>/etc/passwd</code>文件中添加用户信息</li>
+<li>如使用<code>passwd</code>命令创建密码，密码会被加密保存在<code>/etc/shdaow</code>中</li>
+<li>为用户创建家目录：<code>/home/usertest</code>，创建目录操作应操作系统而异</li>
+<li>将<code>/etc/skel</code>中的<code>.bash</code>开头的文件复制至用户家目录</li>
+<li>创建与用户名相同的组，该用户默认属于这个同名组，组信息保存在<code>/etc/group</code>配置文件中</li>
+</ul>
+<blockquote>
+<p>其他命令可选参数如下所示</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-d # 指定新用户的主目录</span><br><span class="line">-G # 指定新用户的组列表</span><br><span class="line">-s # 新用户所使用的shell环境</span><br><span class="line">useradd usertest -s /bin/bash -d /home/usertest</span><br><span class="line"># 创建新用户usertest，指定shell环境为bash，主目录在/home/usertest</span><br></pre></td></tr></table></figure>
+
+<h4 id="删除用户"><a href="#删除用户" class="headerlink" title="删除用户"></a>删除用户</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">userdel # 保留用户的家目录</span><br><span class="line">userdel –r usertest # 删除用户及用户家目录，用户login系统无法删除</span><br><span class="line">userdel –rf usertest # 强制删除用户及该用户家目录，不论是否login系统</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当一个用户创建之后，我们可以通过<code>usermod</code>命令来修改用户及组的属性</p>
+</blockquote>
+<ul>
+<li><code>linux</code>下命令选项</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">选项：</span><br><span class="line">  -c, --comment 注释            GECOS 字段的新值</span><br><span class="line">  -d, --home HOME_DIR           用户的新主目录</span><br><span class="line">  -e, --expiredate EXPIRE_DATE  设定帐户过期的日期为 EXPIRE_DATE</span><br><span class="line">  -f, --inactive INACTIVE       过期 INACTIVE 天数后，设定密码为失效状态</span><br><span class="line">  -g, --gid GROUP               强制使用 GROUP 为新主组</span><br><span class="line">  -G, --groups GROUPS           新的附加组列表 GROUPS</span><br><span class="line">  -a, --append GROUP            将用户追加至上边 -G 中提到的附加组中，</span><br><span class="line">                                并不从其它组中删除此用户</span><br><span class="line">  -h, --help                    显示此帮助信息并推出</span><br><span class="line">  -l, --login LOGIN             新的登录名称</span><br><span class="line">  -L, --lock                    锁定用户帐号</span><br><span class="line">  -m, --move-home               将家目录内容移至新位置 (仅于 -d 一起使用)</span><br><span class="line">  -o, --non-unique              允许使用重复的(非唯一的) UID</span><br><span class="line">  -p, --password PASSWORD       将加密过的密码 (PASSWORD) 设为新密码</span><br><span class="line">  -R, --root CHROOT_DIR         chroot 到的目录</span><br><span class="line">  -s, --shell SHELL             该用户帐号的新登录 shell</span><br><span class="line">  -u, --uid UID                 用户帐号的新 UID</span><br><span class="line">  -U, --unlock                  解锁用户帐号</span><br><span class="line">  -Z, --selinux-user  SEUSER       用户账户的新 SELinux 用户映射</span><br><span class="line">groups username</span><br><span class="line"># 查看用户所属组</span><br></pre></td></tr></table></figure>
+
+<h4 id="修改用户所属组"><a href="#修改用户所属组" class="headerlink" title="修改用户所属组"></a>修改用户所属组</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">usermod usertest -G old_normal</span><br><span class="line"># 将用户usertest修改加入old_normal组中</span><br><span class="line">usermod usertest -a -G other_normal</span><br><span class="line"># 将用户追加至other_normal组中，且不影响原有组状态</span><br><span class="line">cat /etc/group | grep usertest </span><br><span class="line"># 可以查看到usertest用户当前所属组的情况</span><br></pre></td></tr></table></figure>
+
+<h4 id="修改用户家目录及启动shell"><a href="#修改用户家目录及启动shell" class="headerlink" title="修改用户家目录及启动shell"></a>修改用户家目录及启动shell</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">usermod usertest -d /home/user -s /bin/sh</span><br></pre></td></tr></table></figure>
+
+<h4 id="修改用户名"><a href="#修改用户名" class="headerlink" title="修改用户名"></a>修改用户名</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">usermod -l new old</span><br><span class="line"># 将old用户名变为new</span><br></pre></td></tr></table></figure>
+
+<h4 id="锁定-解锁用户"><a href="#锁定-解锁用户" class="headerlink" title="锁定/解锁用户"></a>锁定/解锁用户</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">usermod -L usertest;</span><br><span class="line"># 锁定usertest用户</span><br><span class="line">usermod -U usertest;</span><br><span class="line"># 解锁usertest用户</span><br></pre></td></tr></table></figure>
+
+<h3 id="Linux组管理"><a href="#Linux组管理" class="headerlink" title="Linux组管理"></a>Linux组管理</h3><blockquote>
+<p>所有的<code>Linux</code>或者<code>Windows</code>系统都有组的概念，通过组可以更加方便的管理用户</p>
+<p>组的概念应用于各行行业，例如企业会使用部门、职能或地理区域的分类方式来管理成员，映射在<code>Linux</code>系统，同样可以创建用户，并用组的概念对其管理</p>
+<p>Linux组有如下特点</p>
+</blockquote>
+<ul>
+<li>每个组有一个组<code>ID</code></li>
+<li>组信息保存在<code>/etc/group</code>中</li>
+<li>每个用户至少拥有一个主组，同时还可以拥有<code>31</code>个附属组</li>
+</ul>
+<h4 id="创建新组"><a href="#创建新组" class="headerlink" title="创建新组"></a>创建新组</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">groupadd normal # 创建normal组</span><br><span class="line">groupadd -g 1000 normal # 创建ID为1000的分组</span><br></pre></td></tr></table></figure>
+
+<h4 id="其他组属性"><a href="#其他组属性" class="headerlink" title="其他组属性"></a>其他组属性</h4><blockquote>
+<p>常见参数</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-r # 系统账户</span><br><span class="line">-f # 如果指定的组已经存在，则退出</span><br><span class="line">-g # 指定当前组id</span><br><span class="line">-n --new --old # 修改组名</span><br><span class="line">groupmod -n old_normal normal</span><br><span class="line"># 修改normal组名为old_normal</span><br><span class="line">groupmod -g 1001 old_normal</span><br><span class="line"># 修改old_normal组id为1001</span><br></pre></td></tr></table></figure>
+
+<h2 id="权限"><a href="#权限" class="headerlink" title="权限"></a>权限</h2><blockquote>
+<p>设置好了用户和组，那么接下来就可以对其进行权限控制</p>
+<p>由于linux下处处皆文件，所谓权限也就是对文件的<strong>读</strong>、<strong>写</strong>、<strong>执行</strong>，至少这三种</p>
+<p>当操作系统下某个进程在运行时，进程的权限，也相当于这个进程的运行用户身份权限</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">权限</th>
+<th align="left">文件</th>
+<th align="left">目录</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">r</td>
+<td align="left">读取文件</td>
+<td align="left">列出目录</td>
+</tr>
+<tr>
+<td align="left">w</td>
+<td align="left">修改文件</td>
+<td align="left">修改目录内文件</td>
+</tr>
+<tr>
+<td align="left">x</td>
+<td align="left">执行文件</td>
+<td align="left">进入目录</td>
+</tr>
+</tbody></table>
+<ul>
+<li>权限分组</li>
+</ul>
+<blockquote>
+<p>默认的linux的权限分为三种角色</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt; user`、`group`、`other</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<blockquote>
+<p>每个文件将基于<strong>UGO</strong>三种权限进行设置</p>
+<p>一般一个文件创建之后，谁创建该文件，默认成为该文件的所有者</p>
+</blockquote>
+<h3 id="用户及组权限"><a href="#用户及组权限" class="headerlink" title="用户及组权限"></a>用户及组权限</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ls -ahl</span><br><span class="line"># 查看文件所有者</span><br><span class="line">chmod g+rwx file</span><br><span class="line"># 给file文件增加rwx权限</span><br><span class="line">chmod g-x file</span><br><span class="line"># 给file文件减少x权限</span><br></pre></td></tr></table></figure>
+
+<h3 id="用户及组修改"><a href="#用户及组修改" class="headerlink" title="用户及组修改"></a>用户及组修改</h3><blockquote>
+<p>修改某个文件或目录所属<strong>用户</strong>或<strong>组</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">chown -R root file</span><br><span class="line"># 修改file文件所属用户为root</span><br><span class="line">chown -R :root file</span><br><span class="line"># 修改file文件所属用户为root</span><br><span class="line">chgrp -R root file</span><br><span class="line"># 修改file文件所属组为root</span><br></pre></td></tr></table></figure>
+
+<h3 id="二进制权限"><a href="#二进制权限" class="headerlink" title="二进制权限"></a>二进制权限</h3><blockquote>
+<p>linux下具备权限设置为1，反之为0，那么一个权限按照二进制位数来计算，如下所示</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">--x: 001 1</span><br><span class="line">-wx: 011 3</span><br><span class="line">rwx: 111 7</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>很清晰，对应的权限位置所代表的数字分别是：<strong>r=4</strong>，<strong>w=2</strong>，<strong>x=1</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">chmod 775 file</span><br><span class="line"># 修改file文件权限为 rwxrwxr-x</span><br></pre></td></tr></table></figure>
+
+<h3 id="权限掩码"><a href="#权限掩码" class="headerlink" title="权限掩码"></a>权限掩码</h3><blockquote>
+<p>神奇的事情需要我们考虑，每次创建文件，默认都会具备一定的权限，而这个权限是如何分配而来的呢？</p>
+<p>是通过一个叫做权限掩码的东西来维护的，这个码可以通过<strong>umask</strong>命令看到</p>
+<p>默认系统的掩码是<strong>022</strong></p>
+</blockquote>
+<ul>
+<li>文件权限由默认权限减去掩码</li>
+</ul>
+<blockquote>
+<p>文件默认权限：666<br>那么创建一个文件真实的权限是：666-022=644</p>
+</blockquote>
+<blockquote>
+<p>目录的默认权限：777</p>
+<p>一个目录的真实权限是：777-022=755</p>
+</blockquote>
+<ul>
+<li>设置默认掩码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">umask -S 011</span><br></pre></td></tr></table></figure>
+
+<h3 id="特殊权限"><a href="#特殊权限" class="headerlink" title="特殊权限"></a>特殊权限</h3><table>
+<thead>
+<tr>
+<th align="left">权限</th>
+<th align="left">对文件的影响</th>
+<th align="left">对目录的影响</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>suid</strong></td>
+<td align="left">以文件的所属用户身份执行，而非执行文件的用户</td>
+<td align="left">无</td>
+</tr>
+<tr>
+<td align="left"><strong>sgid</strong></td>
+<td align="left">以文件所属组身份去执行</td>
+<td align="left">在该目录中创建任意新文件的所属组与该目录的所属组相同</td>
+</tr>
+<tr>
+<td align="left"><strong>sticky</strong></td>
+<td align="left">无</td>
+<td align="left">对目录拥有写入权限的用户仅可以删除其拥有的文件，无法删除其他用户所拥有的文件</td>
+</tr>
+</tbody></table>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>Linux权限管理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Mysql主从复制</title>
+    <url>/2017/03/02/Mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/</url>
+    <content><![CDATA[<h2 id="Mysql主从复制"><a href="#Mysql主从复制" class="headerlink" title="Mysql主从复制"></a>Mysql主从复制</h2><ul>
+<li>什么是<strong>主从复制</strong>？</li>
+</ul>
+<blockquote>
+<p>主从复制至少需要两台服务器，或两个<strong>mysql</strong>服务，可以配置一主多从，多主多从</p>
+<p>建立与某个业务数据库一样的数据库环境，即为主从复制</p>
+<p>一般情况下，主库用以写，而从库用以读</p>
+</blockquote>
+<a id="more"></a>
+
+<ul>
+<li>为什么要搭建主从复制？<ol>
+<li>构建主从热备，当某天数据库宕机或或数据丢失情况，可以有备份数据库继续工作</li>
+<li>降低IO频次，多库之间可以合理分配读写压力，提高单个数据库服务的数据库访问压力</li>
+<li>隔离读写，在某些锁表情况下，可以使数据库读操作继续进行</li>
+</ol>
+</li>
+</ul>
+<ul>
+<li>主从复制原理</li>
+</ul>
+<blockquote>
+<p>利用数据库<strong>bin-log</strong>二进制文件，该文件包含有数据库操作的所有SQL语句</p>
+<p>复制该文件至其余数据库服务中并执行即可</p>
+</blockquote>
+<ul>
+<li><p>主从复制过程</p>
+<ol>
+<li><p>当主库具有新数据时，主库会被从库请求，建立线程进行连接，用以传输<strong>binlog</strong>日志</p>
+</li>
+<li><p>从库开启两个线程</p>
+<blockquote>
+<p>A线程：也叫做<strong>IO线程</strong>，连接主库，并请求binlog中的更新记录至从库中，写入至从库的<strong>relaylog</strong>文件中</p>
+<p>B线程：也叫做<strong>SQL线程</strong>，读取<strong>relaylog</strong>文件中的更新操作并执行</p>
+</blockquote>
+</li>
+<li><p>如果，有多个从库同时存在，主库会为每个从库建立一个<strong>binlog</strong>输出线程</p>
+</li>
+</ol>
+</li>
+</ul>
+<p><a href="https://lienze.tech/blog/images/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8E%9F%E7%90%86%E8%87%AA%E7%BB%98.png" target="_blank" rel="noopener"><img src="https://lienze.tech/blog/images/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8E%9F%E7%90%86%E8%87%AA%E7%BB%98.png" alt="主从复制原理自绘"></a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">set global validate_password_policy=LOW;</span><br><span class="line">set global validate_password_length=6;</span><br></pre></td></tr></table></figure>
+
+<h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><blockquote>
+<p>此处以一主一丛为例</p>
+</blockquote>
+<ul>
+<li>系统环境<ul>
+<li>主库（master）：192.168.1.100</li>
+<li>从库（slave）：192.168.1.101</li>
+</ul>
+</li>
+</ul>
+<h3 id="主库修改"><a href="#主库修改" class="headerlink" title="主库修改"></a>主库修改</h3><ul>
+<li>主库配置修改</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">server-id = 1</span><br><span class="line">log-bin=mysql-bin # 开启log bin</span><br><span class="line">expire_logs_days=7 # 日志保存时间</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>server-id</strong>：</p>
+<p>同步数据中必须包含<strong>server-id</strong>，用于标识该语句最初是从哪个<strong>server</strong>写入</p>
+<p>每个<strong>slave</strong>端只能有一个线程在<strong>master</strong>端连接，如果两个<strong>salve</strong>端的<strong>server-id</strong>一致，一个连接成功之后，前一个连接将会被断开</p>
+<p>主主同步时，避免数据同步陷入死循环</p>
+</blockquote>
+<ul>
+<li>主库创建用户，用以从机连接获取<strong>binlog</strong>日志</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grant replication slave on *.* to &apos;master&apos;@&apos;%&apos; identified by &apos;123456&apos;;</span><br><span class="line">flush privileges;</span><br><span class="line">grant all privileges on *.* to master@&apos;%&apos; identified by &quot;123456&quot;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查看master状态（包括日志文件名和对应位置）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show master status;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>记录上条命令返回的<strong>binlog</strong>文件名，<strong>Position</strong>属性，从机连接的时候要用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+------------------+----------+--------------+------------------+-------------------+</span><br><span class="line">| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |</span><br><span class="line">+------------------+----------+--------------+------------------+-------------------+</span><br><span class="line">| mysql-bin.000001 |      154 |              |                  |                   |</span><br><span class="line">+------------------+----------+--------------+------------------+-------------------+</span><br><span class="line">1 row in set (0.00 sec)</span><br></pre></td></tr></table></figure>
+
+<h3 id="从库修改"><a href="#从库修改" class="headerlink" title="从库修改"></a>从库修改</h3><ul>
+<li>从库配置修改</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">server-id=11</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>master</strong>与<strong>slave</strong>端的<strong>server-id</strong>不能一样</p>
+<p><strong>salve</strong>端无需开启<strong>log-bin</strong>功能</p>
+</blockquote>
+<ul>
+<li>从库指定master，执行如下</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">change master to master_host=&apos;118.31.76.26&apos;, master_port=3306, master_user=&apos;master&apos;, master_password=&apos;123456&apos;, master_log_file=&apos;mysql-bin.000001&apos;, master_log_pos=603;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>启动从机</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">start slave;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>从机连接停止（配置错误，从新连接时使用）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">stop slave;</span><br><span class="line">reset slave all;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>查询连接状态</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show slave status \G;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>显示为正确</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">*************************** 1. row ***************************</span><br><span class="line">Slave_IO_State: Waiting for master to send event</span><br><span class="line">Master_Host: 192.168.1.9</span><br><span class="line">Master_User: reader</span><br><span class="line">Master_Port: 3307</span><br><span class="line">Connect_Retry: 60</span><br><span class="line">Master_Log_File: mysql-bin.000007</span><br><span class="line">Read_Master_Log_Pos: 501</span><br><span class="line">Relay_Log_File: 0b763a8d1ddd-relay-bin.000002</span><br><span class="line">Relay_Log_Pos: 320</span><br><span class="line">Relay_Master_Log_File: mysql-bin.000007</span><br><span class="line">Slave_IO_Running: Yes</span><br><span class="line">Slave_SQL_Running: Yes</span><br><span class="line">Last_IO_Error: 错误显示地方</span><br></pre></td></tr></table></figure>
+
+<p>###项目配置</p>
+<h4 id="settings-py文件"><a href="#settings-py文件" class="headerlink" title="settings.py文件"></a>settings.py文件</h4><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">DATABASES = &#123;</span><br><span class="line">	<span class="string">'default'</span>: &#123;</span><br><span class="line">		<span class="string">'ENGINE'</span>: <span class="string">'django.db.backends.mysql'</span>,</span><br><span class="line">		<span class="string">'HOST'</span>: <span class="string">'118.31.76.26'</span>, <span class="comment"># 数据库主机</span></span><br><span class="line">		<span class="string">'PORT'</span>: <span class="number">3306</span>, <span class="comment"># 数据库端口</span></span><br><span class="line">		<span class="string">'USER'</span>: <span class="string">'root'</span>, <span class="comment"># 数据库用户名</span></span><br><span class="line">		<span class="string">'PASSWORD'</span>: <span class="string">'123456'</span>, <span class="comment"># 数据库用户密码</span></span><br><span class="line">		<span class="string">'NAME'</span>: <span class="string">'slave'</span> <span class="comment"># 数据库名字</span></span><br><span class="line">	&#125;,</span><br><span class="line">    <span class="string">'slave'</span>: &#123;</span><br><span class="line">		<span class="string">'ENGINE'</span>: <span class="string">'django.db.backends.mysql'</span>,</span><br><span class="line">		<span class="string">'HOST'</span>: <span class="string">'118.31.76.26'</span>, <span class="comment"># 数据库主机</span></span><br><span class="line">		<span class="string">'PORT'</span>: <span class="number">3307</span>, <span class="comment"># 数据库端口</span></span><br><span class="line">		<span class="string">'USER'</span>: <span class="string">'root'</span>, <span class="comment"># 数据库用户名</span></span><br><span class="line">		<span class="string">'PASSWORD'</span>: <span class="string">'123456'</span>, <span class="comment"># 数据库用户密码</span></span><br><span class="line">		<span class="string">'NAME'</span>: <span class="string">'slave'</span> <span class="comment"># 数据库名字</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">DATABASES_ROUTERS= [<span class="string">'slave.utils.DBrouter'</span>]</span><br></pre></td></tr></table></figure>
+
+<h4 id="主路由下utils-py"><a href="#主路由下utils-py" class="headerlink" title="主路由下utils.py"></a>主路由下utils.py</h4><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DBrouter</span>:</span></span><br><span class="line">    <span class="string">"""数据库主从读写分离路由"""</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db_for_read</span><span class="params">(self,model,**hints)</span>:</span></span><br><span class="line">        <span class="string">"""读数据库"""</span></span><br><span class="line">        print(<span class="string">'给从'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'slave'</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">db_for_write</span><span class="params">(self,model,**hints)</span>:</span></span><br><span class="line">        <span class="string">"""写数据库"""</span></span><br><span class="line">        print(<span class="string">'给主'</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'default'</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">allow_relation</span><span class="params">(self,db1,db2,**k)</span>:</span></span><br><span class="line">        <span class="string">"""是否运行关联操作"""</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="同步特定的库"><a href="#同步特定的库" class="headerlink" title="同步特定的库"></a>同步特定的库</h3><h4 id="主机处配置"><a href="#主机处配置" class="headerlink" title="主机处配置"></a>主机处配置</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">binlog-do-db=xxxx   # 二进制日志记录的数据库</span><br><span class="line">binlog-ignore-db=xxxx # 二进制日志中忽略数据库</span><br></pre></td></tr></table></figure>
+
+<h4 id="从机处配置"><a href="#从机处配置" class="headerlink" title="从机处配置"></a>从机处配置</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">replicate-do-db    # 设定需要复制的数据库</span><br><span class="line">replicate-ignore-db # 设定需要忽略的复制数据库</span><br><span class="line">replicate-do-table  # 设定需要复制的表</span><br><span class="line">replicate-ignore-table # 设定需要忽略的复制表</span><br><span class="line">replicate-wild-do-table # 同replication-do-table功能一样，但是可以通配符</span><br><span class="line">replicate-wild-ignore-table # 同replication-ignore-table功能一样，但是可以加通配符</span><br></pre></td></tr></table></figure>
+
+<h3 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h3><ul>
+<li><strong>mysql</strong>-&gt;<strong>mariadb</strong>版本问题</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Last_IO_Error: Got fatal error 1236 from master when reading data from binary log: &apos;Client requested master to start replication from position &gt; file size&apos;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>从<strong>MySQL5.6</strong>开始引入了<strong>binlog_checksum</strong>全局变量，即<strong>MySQL</strong>会将<strong>event</strong>的<strong>CRC32</strong>校验值也写入<strong>binlog</strong>，显然<strong>MariaDB</strong>在分析日志的时候不会考虑该信息，导致解析出错</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">show variables like &apos;%binlog%&apos;;</span><br><span class="line">set global binlog_checksum=NONE;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>Mysql</category>
+      </categories>
+      <tags>
+        <tag>Mysql</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Django邮件发送及华丽呼哨的邮件格式</title>
+    <url>/2015/11/12/Django%E9%82%AE%E4%BB%B6%E5%8F%91%E9%80%81%E5%8F%8A%E5%8D%8E%E4%B8%BD%E5%91%BC%E5%93%A8%E7%9A%84%E9%82%AE%E4%BB%B6%E6%A0%BC%E5%BC%8F/</url>
+    <content><![CDATA[<h2 id="发送邮件"><a href="#发送邮件" class="headerlink" title="发送邮件"></a>发送邮件</h2><blockquote>
+<p><code>django</code>中内置了许多方法可以使开发者方便的进行邮件发送</p>
+</blockquote><a id="more"></a>
+<h3 id="邮件配置"><a href="#邮件配置" class="headerlink" title="邮件配置"></a>邮件配置</h3><blockquote>
+<p>发送邮件，首先需要在项目的<code>settings.py</code>文件下配置邮件服务器连接等信息</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">EMAIL_USE_SSL = <span class="literal">True</span> <span class="comment"># Secure Sockets Layer 安全套接层, 取决于邮件服务器是否开启加密协议</span></span><br><span class="line">EMAIL_HOST = <span class="string">'smtp.qq.com'</span>  <span class="comment"># 邮件服务器地址</span></span><br><span class="line">EMAIL_PORT = <span class="number">465</span> <span class="comment"># 邮件服务器端口 </span></span><br><span class="line">EMAIL_HOST_USER = <span class="string">'account@qq.com'</span> <span class="comment"># 登陆邮件服务器的账号</span></span><br><span class="line">EMAIL_HOST_PASSWORD = <span class="string">'password'</span>  <span class="comment"># 登陆邮件服务器的密码</span></span><br><span class="line">DEFAULT_FROM_EMAIL = EMAIL_HOST_USER <span class="comment"># 邮件的发送者</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>注意</strong>：<code>EMAIL_HOST_PASSWORD</code>所设置的登陆邮件服务器的密码为邮件客户端后台所设置的第三方客户端登陆密码，这个值并非直接账号密码</p>
+<p>如：<code>QQ</code>邮箱的该值密码在网页版<code>QQ</code>邮件客户端的设置<code>-&gt;</code>帐户<code>-&gt;</code>开启<code>POP3/SMTP服务|IMAP/SMTP服务</code></p>
+</blockquote>
+<h3 id="发送文本邮件"><a href="#发送文本邮件" class="headerlink" title="发送文本邮件"></a>发送文本邮件</h3><blockquote>
+<p>发送普通邮件可以使用<code>django.core.mail</code>模块下的<code>send_mail</code>函数进行</p>
+</blockquote>
+<ul>
+<li><p><code>send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=None)</code></p>
+<blockquote>
+<p>将邮件发送至<code>recipient_list</code>中的每一个收件人处</p>
+</blockquote>
+<blockquote>
+<p><code>subject</code>：发送邮件标题</p>
+<p><code>message</code>：发送邮件正文</p>
+<p><code>from_email</code>：发件人邮箱地址</p>
+<p><code>recipient_list</code>：一个字符串列表，每一个数据为接收者的邮箱地址</p>
+<p><code>html_message</code>：如果指定该值，则发送的内容类型为<code>text/html</code>为一个<code>html</code>邮件内容</p>
+</blockquote>
+</li>
+<li><p>发送普通邮件视图函数</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> django.core.mail <span class="keyword">import</span> send_mail</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_email</span><span class="params">(request)</span>:</span></span><br><span class="line">    subject = <span class="string">'邮件测试'</span></span><br><span class="line">    message = <span class="string">'&lt;a href="http://www.python.org"&gt;学习Python，我很快乐&lt;/a&gt;'</span></span><br><span class="line">    send_mail(</span><br><span class="line">        subject = subject,</span><br><span class="line">        message = message,</span><br><span class="line">        from_email = <span class="string">'from@qq.com'</span>,</span><br><span class="line">        recipient_list = [<span class="string">'recv@qq.com'</span>,<span class="string">'recv1@qq.com'</span>]</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">return</span> HttpResponse(<span class="string">'Down'</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="发送HTML邮件"><a href="#发送HTML邮件" class="headerlink" title="发送HTML邮件"></a>发送HTML邮件</h3><blockquote>
+<p>发送这里的邮件内容为一个<code>HTML</code>的<code>a</code>标签，但是真正接收者接到该邮件时，<code>a</code>标签并不会解释称为真正的<code>a</code>标签，只是一个普通的字符串，这是因为当前发送邮件的类型为<code>text/plain</code>，可以使用<code>html_message</code>参数进行<code>HTML</code>内容的发送</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> django.core.mail <span class="keyword">import</span> send_mail</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_email</span><span class="params">(request)</span>:</span>    </span><br><span class="line">    subject = <span class="string">'邮件测试'</span></span><br><span class="line">    message = <span class="string">'&lt;a href="http://www.python.org"&gt;学习Python，我很快乐&lt;/a&gt;'</span></span><br><span class="line">    send_mail(</span><br><span class="line">        subject = subject,</span><br><span class="line">        message = <span class="string">''</span>, <span class="comment"># 该参数为必须参数，必须填写</span></span><br><span class="line">        html_message = message,</span><br><span class="line">        from_email = <span class="string">'from@qq.com'</span>,</span><br><span class="line">        recipient_list =[<span class="string">'recv@qq.com'</span>,<span class="string">'recv1@qq.com'</span>]</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">return</span> HttpResponse(<span class="string">'Down'</span>)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>发送<code>html</code>格式邮件还可以使用<code>django.core.mail</code>模块下的<code>EmailMultiAlternatives</code>类进行邮件体的构造，然后进行邮件发送</p>
+</blockquote>
+<ul>
+<li><p><code>EmailMultiAlternatives(subject=&#39;&#39;, body=&#39;&#39;, from_email=None, to=None)</code></p>
+<blockquote>
+<p><code>subject</code>：邮件标题</p>
+<p><code>body</code>：邮件内容</p>
+<p><code>from_email</code>：邮件发送者</p>
+<p><code>to</code>：邮件接收人列表</p>
+</blockquote>
+</li>
+<li><p><code>EmailMultiAlternatives.attach_alternative(content, mimetype)</code></p>
+<blockquote>
+<p>向<code>EmailMultiAlternatives</code>实例中添加<code>mimetype</code>支持的邮件内容</p>
+<p><code>content</code>：添加的邮件内容</p>
+<p><code>mimetype</code>：添加内容的<code>mime</code>类型</p>
+</blockquote>
+</li>
+<li><p><code>EmailMultiAlternatives.send()</code></p>
+<blockquote>
+<p>发送邮件</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> django.core.mail <span class="keyword">import</span> EmailMultiAlternatives</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_email</span><span class="params">(request)</span>:</span></span><br><span class="line">    subject = <span class="string">'邮件测试'</span></span><br><span class="line">    text_message = <span class="string">'学习Python，我很快乐'</span></span><br><span class="line">    html_message = <span class="string">'&lt;a href="http://www.python.org"&gt;学习Python，我很快乐&lt;/a&gt;'</span></span><br><span class="line">    email = EmailMultiAlternatives(</span><br><span class="line">        subject = subject,</span><br><span class="line">        body = text_message,</span><br><span class="line">        from_email = <span class="string">'1747266529@qq.com'</span>,</span><br><span class="line">        to = [<span class="string">'recv@qq.com'</span>,<span class="string">'recv1@qq.com'</span>]</span><br><span class="line">    )</span><br><span class="line">    email.attach_alternative(html_message,<span class="string">'text/html'</span>) <span class="comment"># 添加HTML邮件部分</span></span><br><span class="line">    email.send() <span class="comment"># 发送邮件</span></span><br><span class="line">    <span class="keyword">return</span> HttpResponse(<span class="string">'Down'</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="发送富文本邮件"><a href="#发送富文本邮件" class="headerlink" title="发送富文本邮件"></a>发送富文本邮件</h3><blockquote>
+<p>经常需要我们在邮件中加入图片等静态资源</p>
+<p>需要用到<code>python</code>中<code>email.mime.image</code>模块下的<code>MIMEImage</code>类进行图片内容的构造</p>
+<p>这里发送邮件使用<code>EmailMessage</code>类，来自于<code>django.core.mail</code>模块下</p>
+<p>并在使用对应该类实例的<code>attach</code>添加图片资源数据</p>
+<p>最后使用实例的<code>send</code>函数发送邮件</p>
+</blockquote>
+<ul>
+<li><p><code>EmailMessage(subject=&#39;&#39;, body=&#39;&#39;, from_email=None, to=None)</code></p>
+<blockquote>
+<p>``subject`：邮件标题</p>
+<p><code>body</code>：邮件内容</p>
+<p><code>from_email</code>：邮件发送者</p>
+<p><code>to</code>：邮件接收人列表</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sendmailpro.settings <span class="keyword">import</span> STATICFILES_DIRS</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> email.mime.image <span class="keyword">import</span> MIMEImage</span><br><span class="line"><span class="keyword">from</span> django.core.mail <span class="keyword">import</span> EmailMessage</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_email</span><span class="params">(request)</span>:</span></span><br><span class="line">    subject = <span class="string">'图片邮件测试'</span></span><br><span class="line">    file_1 = os.path.join(STATICFILES_DIRS[<span class="number">0</span>],<span class="string">'img/1.png'</span>)</span><br><span class="line">    <span class="keyword">with</span> open(file_1, <span class="string">'rb'</span>) <span class="keyword">as</span> fp: </span><br><span class="line">        <span class="comment"># 打开第一张图片</span></span><br><span class="line">        image_1 = MIMEImage(fp.read())</span><br><span class="line">        </span><br><span class="line">    file_2 = os.path.join(STATICFILES_DIRS[<span class="number">0</span>],<span class="string">'img/2.png'</span>)</span><br><span class="line">    <span class="keyword">with</span> open(file_2, <span class="string">'rb'</span>) <span class="keyword">as</span> fp: </span><br><span class="line">        <span class="comment"># 打开第二张图片</span></span><br><span class="line">        image_2 = MIMEImage(fp.read())</span><br><span class="line">        </span><br><span class="line">    body = <span class="string">"&lt;img src='cid:first_id'&gt;&lt;br&gt;&lt;img src='cid:sec_id'&gt;"</span></span><br><span class="line">    <span class="comment"># 发送邮件主体内容</span></span><br><span class="line">    </span><br><span class="line">	image_1.add_header(<span class="string">'Content-ID'</span>,<span class="string">'&lt;%s&gt;'</span> % <span class="string">'first_id'</span>) </span><br><span class="line">    <span class="comment"># 通过 CID 对称图片在邮件内容中的位置</span></span><br><span class="line">    image_2.add_header(<span class="string">'Content-ID'</span>,<span class="string">'&lt;%s&gt;'</span> % <span class="string">'sec_id'</span>)</span><br><span class="line">    </span><br><span class="line">    message = EmailMessage( <span class="comment"># 构建发送的邮件主体</span></span><br><span class="line">                subject=subject,</span><br><span class="line">                body=body,</span><br><span class="line">                from_email=<span class="string">'from@qq.com'</span>,</span><br><span class="line">                to=[<span class="string">'recv@qq.com'</span>,<span class="string">'recv1@qq.com'</span>]</span><br><span class="line">            )</span><br><span class="line">    message.content_subtype = <span class="string">'html'</span></span><br><span class="line">    message.attach(image_1) <span class="comment"># 添加两张图片</span></span><br><span class="line">    message.attach(image_2)</span><br><span class="line">    message.send() <span class="comment"># 发送邮件</span></span><br><span class="line">    <span class="keyword">return</span> HttpResponse(<span class="string">'Down'</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="发送附件邮件"><a href="#发送附件邮件" class="headerlink" title="发送附件邮件"></a>发送附件邮件</h3><blockquote>
+<p>发送附件，也可以使用<code>django.core.mail</code>模块下的<code>EmailMessage</code>类进行附件邮件体构造</p>
+<p>通过<code>EmailMessage</code>实例的<code>attach|attach_file</code>两个函数在邮件主体中添加附件内容</p>
+<p><code>attach_file</code>添加邮件附件直接加入路径即可，但是<code>attach</code>添加附件内容需要提供附件内容</p>
+</blockquote>
+<ul>
+<li><p><code>attach(filename=None, content=None, mimetype=None)</code></p>
+<blockquote>
+<p>添加附件内容</p>
+</blockquote>
+<blockquote>
+<p><code>filename</code>：附件文件名称</p>
+<p><code>content</code>：附件内容</p>
+<p><code>mimetype</code>：附件的<code>MIME</code>类型</p>
+</blockquote>
+</li>
+<li><p><code>attach_file(path, mimetype=None)</code></p>
+<blockquote>
+<p>直接通过路径添加附件</p>
+</blockquote>
+<blockquote>
+<p><code>path</code>：附件路径</p>
+<p><code>mimetype</code>：附件的<code>MIME</code>类型</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> sendmailpro.settings <span class="keyword">import</span> STATICFILES_DIRS</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> email.mime.image <span class="keyword">import</span> MIMEImage</span><br><span class="line"><span class="keyword">from</span> django.core.mail <span class="keyword">import</span> EmailMessage</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_email</span><span class="params">(request)</span>:</span></span><br><span class="line">    subject = <span class="string">'附件邮件测试'</span></span><br><span class="line">    email = EmailMessage(</span><br><span class="line">        subject=subject,</span><br><span class="line">        body=<span class="string">'这是一封具有图片附件的邮件'</span>,</span><br><span class="line">        from_email=<span class="string">'from@qq.com'</span>,</span><br><span class="line">        to=[<span class="string">'recv@qq.com'</span>,<span class="string">'recv1@qq.com'</span>]</span><br><span class="line">    )</span><br><span class="line">    file_1 = os.path.join(STATICFILES_DIRS[<span class="number">0</span>],<span class="string">'img/1.png'</span>)</span><br><span class="line">    image_1 = open(file_1,<span class="string">'rb'</span>).read()</span><br><span class="line">    email.attach(<span class="string">'1.png'</span>,image_1,<span class="string">'image/png'</span>) <span class="comment"># 使用attach实例函数添加附件内容</span></span><br><span class="line"></span><br><span class="line">    file_2 = os.path.join(STATICFILES_DIRS[<span class="number">0</span>],<span class="string">'img/2.png'</span>)</span><br><span class="line">    email.attach_file(file_2,mimetype=<span class="string">'image/png'</span>) <span class="comment"># 使用attach_file实例函数添加附件路径</span></span><br><span class="line"></span><br><span class="line">    email.send()</span><br><span class="line">    <span class="keyword">return</span> HttpResponse(<span class="string">'Down'</span>)</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Django</category>
+      </categories>
+      <tags>
+        <tag>Django</tag>
       </tags>
   </entry>
 </search>

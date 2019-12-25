@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="LGZ BLOG" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+
+  <meta name="description" content="发送邮件 django中内置了许多方法可以使开发者方便的进行邮件发送">
+<meta name="keywords" content="Django">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django邮件发送及华丽呼哨的邮件格式">
+<meta property="og:url" content="http://xiaozhuang.tech/2015/11/12/Django邮件发送及华丽呼哨的邮件格式/index.html">
+<meta property="og:site_name" content="LGZ BLOG">
+<meta property="og:description" content="发送邮件 django中内置了许多方法可以使开发者方便的进行邮件发送">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-25T00:14:24.981Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Django邮件发送及华丽呼哨的邮件格式">
+<meta name="twitter:description" content="发送邮件 django中内置了许多方法可以使开发者方便的进行邮件发送">
+
+<link rel="canonical" href="http://xiaozhuang.tech/2015/11/12/Django邮件发送及华丽呼哨的邮件格式/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Django邮件发送及华丽呼哨的邮件格式 | LGZ BLOG</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LGZ BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Action is the proper fruit of knowledge</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaozhuang.tech/2015/11/12/Django邮件发送及华丽呼哨的邮件格式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cao.jpg">
+      <meta itemprop="name" content="Xiao Zhuang">
+      <meta itemprop="description" content="小试牛刀">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LGZ BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Django邮件发送及华丽呼哨的邮件格式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2015-11-12 21:22:13" itemprop="dateCreated datePublished" datetime="2015-11-12T21:22:13+08:00">2015-11-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Django/" itemprop="url" rel="index">
+                    <span itemprop="name">Django</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="发送邮件"><a href="#发送邮件" class="headerlink" title="发送邮件"></a>发送邮件</h2><blockquote>
+<p><code>django</code>中内置了许多方法可以使开发者方便的进行邮件发送</p>
+</blockquote><a id="more"></a>
+<h3 id="邮件配置"><a href="#邮件配置" class="headerlink" title="邮件配置"></a>邮件配置</h3><blockquote>
+<p>发送邮件，首先需要在项目的<code>settings.py</code>文件下配置邮件服务器连接等信息</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">EMAIL_USE_SSL = <span class="literal">True</span> <span class="comment"># Secure Sockets Layer 安全套接层, 取决于邮件服务器是否开启加密协议</span></span><br><span class="line">EMAIL_HOST = <span class="string">'smtp.qq.com'</span>  <span class="comment"># 邮件服务器地址</span></span><br><span class="line">EMAIL_PORT = <span class="number">465</span> <span class="comment"># 邮件服务器端口 </span></span><br><span class="line">EMAIL_HOST_USER = <span class="string">'account@qq.com'</span> <span class="comment"># 登陆邮件服务器的账号</span></span><br><span class="line">EMAIL_HOST_PASSWORD = <span class="string">'password'</span>  <span class="comment"># 登陆邮件服务器的密码</span></span><br><span class="line">DEFAULT_FROM_EMAIL = EMAIL_HOST_USER <span class="comment"># 邮件的发送者</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>注意</strong>：<code>EMAIL_HOST_PASSWORD</code>所设置的登陆邮件服务器的密码为邮件客户端后台所设置的第三方客户端登陆密码，这个值并非直接账号密码</p>
+<p>如：<code>QQ</code>邮箱的该值密码在网页版<code>QQ</code>邮件客户端的设置<code>-&gt;</code>帐户<code>-&gt;</code>开启<code>POP3/SMTP服务|IMAP/SMTP服务</code></p>
+</blockquote>
+<h3 id="发送文本邮件"><a href="#发送文本邮件" class="headerlink" title="发送文本邮件"></a>发送文本邮件</h3><blockquote>
+<p>发送普通邮件可以使用<code>django.core.mail</code>模块下的<code>send_mail</code>函数进行</p>
+</blockquote>
+<ul>
+<li><p><code>send_mail(subject, message, from_email, recipient_list, fail_silently=False, html_message=None)</code></p>
+<blockquote>
+<p>将邮件发送至<code>recipient_list</code>中的每一个收件人处</p>
+</blockquote>
+<blockquote>
+<p><code>subject</code>：发送邮件标题</p>
+<p><code>message</code>：发送邮件正文</p>
+<p><code>from_email</code>：发件人邮箱地址</p>
+<p><code>recipient_list</code>：一个字符串列表，每一个数据为接收者的邮箱地址</p>
+<p><code>html_message</code>：如果指定该值，则发送的内容类型为<code>text/html</code>为一个<code>html</code>邮件内容</p>
+</blockquote>
+</li>
+<li><p>发送普通邮件视图函数</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.core.mail <span class="keyword">import</span> send_mail</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_email</span><span class="params">(request)</span>:</span></span><br><span class="line">    subject = <span class="string">'邮件测试'</span></span><br><span class="line">    message = <span class="string">'&lt;a href="http://www.python.org"&gt;学习Python，我很快乐&lt;/a&gt;'</span></span><br><span class="line">    send_mail(</span><br><span class="line">        subject = subject,</span><br><span class="line">        message = message,</span><br><span class="line">        from_email = <span class="string">'from@qq.com'</span>,</span><br><span class="line">        recipient_list = [<span class="string">'recv@qq.com'</span>,<span class="string">'recv1@qq.com'</span>]</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">return</span> HttpResponse(<span class="string">'Down'</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="发送HTML邮件"><a href="#发送HTML邮件" class="headerlink" title="发送HTML邮件"></a>发送HTML邮件</h3><blockquote>
+<p>发送这里的邮件内容为一个<code>HTML</code>的<code>a</code>标签，但是真正接收者接到该邮件时，<code>a</code>标签并不会解释称为真正的<code>a</code>标签，只是一个普通的字符串，这是因为当前发送邮件的类型为<code>text/plain</code>，可以使用<code>html_message</code>参数进行<code>HTML</code>内容的发送</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.core.mail <span class="keyword">import</span> send_mail</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_email</span><span class="params">(request)</span>:</span>    </span><br><span class="line">    subject = <span class="string">'邮件测试'</span></span><br><span class="line">    message = <span class="string">'&lt;a href="http://www.python.org"&gt;学习Python，我很快乐&lt;/a&gt;'</span></span><br><span class="line">    send_mail(</span><br><span class="line">        subject = subject,</span><br><span class="line">        message = <span class="string">''</span>, <span class="comment"># 该参数为必须参数，必须填写</span></span><br><span class="line">        html_message = message,</span><br><span class="line">        from_email = <span class="string">'from@qq.com'</span>,</span><br><span class="line">        recipient_list =[<span class="string">'recv@qq.com'</span>,<span class="string">'recv1@qq.com'</span>]</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">return</span> HttpResponse(<span class="string">'Down'</span>)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>发送<code>html</code>格式邮件还可以使用<code>django.core.mail</code>模块下的<code>EmailMultiAlternatives</code>类进行邮件体的构造，然后进行邮件发送</p>
+</blockquote>
+<ul>
+<li><p><code>EmailMultiAlternatives(subject=&#39;&#39;, body=&#39;&#39;, from_email=None, to=None)</code></p>
+<blockquote>
+<p><code>subject</code>：邮件标题</p>
+<p><code>body</code>：邮件内容</p>
+<p><code>from_email</code>：邮件发送者</p>
+<p><code>to</code>：邮件接收人列表</p>
+</blockquote>
+</li>
+<li><p><code>EmailMultiAlternatives.attach_alternative(content, mimetype)</code></p>
+<blockquote>
+<p>向<code>EmailMultiAlternatives</code>实例中添加<code>mimetype</code>支持的邮件内容</p>
+<p><code>content</code>：添加的邮件内容</p>
+<p><code>mimetype</code>：添加内容的<code>mime</code>类型</p>
+</blockquote>
+</li>
+<li><p><code>EmailMultiAlternatives.send()</code></p>
+<blockquote>
+<p>发送邮件</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.core.mail <span class="keyword">import</span> EmailMultiAlternatives</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_email</span><span class="params">(request)</span>:</span></span><br><span class="line">    subject = <span class="string">'邮件测试'</span></span><br><span class="line">    text_message = <span class="string">'学习Python，我很快乐'</span></span><br><span class="line">    html_message = <span class="string">'&lt;a href="http://www.python.org"&gt;学习Python，我很快乐&lt;/a&gt;'</span></span><br><span class="line">    email = EmailMultiAlternatives(</span><br><span class="line">        subject = subject,</span><br><span class="line">        body = text_message,</span><br><span class="line">        from_email = <span class="string">'1747266529@qq.com'</span>,</span><br><span class="line">        to = [<span class="string">'recv@qq.com'</span>,<span class="string">'recv1@qq.com'</span>]</span><br><span class="line">    )</span><br><span class="line">    email.attach_alternative(html_message,<span class="string">'text/html'</span>) <span class="comment"># 添加HTML邮件部分</span></span><br><span class="line">    email.send() <span class="comment"># 发送邮件</span></span><br><span class="line">    <span class="keyword">return</span> HttpResponse(<span class="string">'Down'</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="发送富文本邮件"><a href="#发送富文本邮件" class="headerlink" title="发送富文本邮件"></a>发送富文本邮件</h3><blockquote>
+<p>经常需要我们在邮件中加入图片等静态资源</p>
+<p>需要用到<code>python</code>中<code>email.mime.image</code>模块下的<code>MIMEImage</code>类进行图片内容的构造</p>
+<p>这里发送邮件使用<code>EmailMessage</code>类，来自于<code>django.core.mail</code>模块下</p>
+<p>并在使用对应该类实例的<code>attach</code>添加图片资源数据</p>
+<p>最后使用实例的<code>send</code>函数发送邮件</p>
+</blockquote>
+<ul>
+<li><p><code>EmailMessage(subject=&#39;&#39;, body=&#39;&#39;, from_email=None, to=None)</code></p>
+<blockquote>
+<p>``subject`：邮件标题</p>
+<p><code>body</code>：邮件内容</p>
+<p><code>from_email</code>：邮件发送者</p>
+<p><code>to</code>：邮件接收人列表</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sendmailpro.settings <span class="keyword">import</span> STATICFILES_DIRS</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> email.mime.image <span class="keyword">import</span> MIMEImage</span><br><span class="line"><span class="keyword">from</span> django.core.mail <span class="keyword">import</span> EmailMessage</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_email</span><span class="params">(request)</span>:</span></span><br><span class="line">    subject = <span class="string">'图片邮件测试'</span></span><br><span class="line">    file_1 = os.path.join(STATICFILES_DIRS[<span class="number">0</span>],<span class="string">'img/1.png'</span>)</span><br><span class="line">    <span class="keyword">with</span> open(file_1, <span class="string">'rb'</span>) <span class="keyword">as</span> fp: </span><br><span class="line">        <span class="comment"># 打开第一张图片</span></span><br><span class="line">        image_1 = MIMEImage(fp.read())</span><br><span class="line">        </span><br><span class="line">    file_2 = os.path.join(STATICFILES_DIRS[<span class="number">0</span>],<span class="string">'img/2.png'</span>)</span><br><span class="line">    <span class="keyword">with</span> open(file_2, <span class="string">'rb'</span>) <span class="keyword">as</span> fp: </span><br><span class="line">        <span class="comment"># 打开第二张图片</span></span><br><span class="line">        image_2 = MIMEImage(fp.read())</span><br><span class="line">        </span><br><span class="line">    body = <span class="string">"&lt;img src='cid:first_id'&gt;&lt;br&gt;&lt;img src='cid:sec_id'&gt;"</span></span><br><span class="line">    <span class="comment"># 发送邮件主体内容</span></span><br><span class="line">    </span><br><span class="line">	image_1.add_header(<span class="string">'Content-ID'</span>,<span class="string">'&lt;%s&gt;'</span> % <span class="string">'first_id'</span>) </span><br><span class="line">    <span class="comment"># 通过 CID 对称图片在邮件内容中的位置</span></span><br><span class="line">    image_2.add_header(<span class="string">'Content-ID'</span>,<span class="string">'&lt;%s&gt;'</span> % <span class="string">'sec_id'</span>)</span><br><span class="line">    </span><br><span class="line">    message = EmailMessage( <span class="comment"># 构建发送的邮件主体</span></span><br><span class="line">                subject=subject,</span><br><span class="line">                body=body,</span><br><span class="line">                from_email=<span class="string">'from@qq.com'</span>,</span><br><span class="line">                to=[<span class="string">'recv@qq.com'</span>,<span class="string">'recv1@qq.com'</span>]</span><br><span class="line">            )</span><br><span class="line">    message.content_subtype = <span class="string">'html'</span></span><br><span class="line">    message.attach(image_1) <span class="comment"># 添加两张图片</span></span><br><span class="line">    message.attach(image_2)</span><br><span class="line">    message.send() <span class="comment"># 发送邮件</span></span><br><span class="line">    <span class="keyword">return</span> HttpResponse(<span class="string">'Down'</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="发送附件邮件"><a href="#发送附件邮件" class="headerlink" title="发送附件邮件"></a>发送附件邮件</h3><blockquote>
+<p>发送附件，也可以使用<code>django.core.mail</code>模块下的<code>EmailMessage</code>类进行附件邮件体构造</p>
+<p>通过<code>EmailMessage</code>实例的<code>attach|attach_file</code>两个函数在邮件主体中添加附件内容</p>
+<p><code>attach_file</code>添加邮件附件直接加入路径即可，但是<code>attach</code>添加附件内容需要提供附件内容</p>
+</blockquote>
+<ul>
+<li><p><code>attach(filename=None, content=None, mimetype=None)</code></p>
+<blockquote>
+<p>添加附件内容</p>
+</blockquote>
+<blockquote>
+<p><code>filename</code>：附件文件名称</p>
+<p><code>content</code>：附件内容</p>
+<p><code>mimetype</code>：附件的<code>MIME</code>类型</p>
+</blockquote>
+</li>
+<li><p><code>attach_file(path, mimetype=None)</code></p>
+<blockquote>
+<p>直接通过路径添加附件</p>
+</blockquote>
+<blockquote>
+<p><code>path</code>：附件路径</p>
+<p><code>mimetype</code>：附件的<code>MIME</code>类型</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sendmailpro.settings <span class="keyword">import</span> STATICFILES_DIRS</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">from</span> email.mime.image <span class="keyword">import</span> MIMEImage</span><br><span class="line"><span class="keyword">from</span> django.core.mail <span class="keyword">import</span> EmailMessage</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_email</span><span class="params">(request)</span>:</span></span><br><span class="line">    subject = <span class="string">'附件邮件测试'</span></span><br><span class="line">    email = EmailMessage(</span><br><span class="line">        subject=subject,</span><br><span class="line">        body=<span class="string">'这是一封具有图片附件的邮件'</span>,</span><br><span class="line">        from_email=<span class="string">'from@qq.com'</span>,</span><br><span class="line">        to=[<span class="string">'recv@qq.com'</span>,<span class="string">'recv1@qq.com'</span>]</span><br><span class="line">    )</span><br><span class="line">    file_1 = os.path.join(STATICFILES_DIRS[<span class="number">0</span>],<span class="string">'img/1.png'</span>)</span><br><span class="line">    image_1 = open(file_1,<span class="string">'rb'</span>).read()</span><br><span class="line">    email.attach(<span class="string">'1.png'</span>,image_1,<span class="string">'image/png'</span>) <span class="comment"># 使用attach实例函数添加附件内容</span></span><br><span class="line"></span><br><span class="line">    file_2 = os.path.join(STATICFILES_DIRS[<span class="number">0</span>],<span class="string">'img/2.png'</span>)</span><br><span class="line">    email.attach_file(file_2,mimetype=<span class="string">'image/png'</span>) <span class="comment"># 使用attach_file实例函数添加附件路径</span></span><br><span class="line"></span><br><span class="line">    email.send()</span><br><span class="line">    <span class="keyword">return</span> HttpResponse(<span class="string">'Down'</span>)</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xiao Zhuang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaozhuang.tech/2015/11/12/Django邮件发送及华丽呼哨的邮件格式/" title="Django邮件发送及华丽呼哨的邮件格式">http://xiaozhuang.tech/2015/11/12/Django邮件发送及华丽呼哨的邮件格式/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <div>
+        
+          <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+        
+      </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Django/" rel="tag"># Django</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2017/03/02/Mysql主从复制/" rel="prev" title="Mysql主从复制">
+                  Mysql主从复制 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#发送邮件"><span class="nav-text">发送邮件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#邮件配置"><span class="nav-text">邮件配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发送文本邮件"><span class="nav-text">发送文本邮件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发送HTML邮件"><span class="nav-text">发送HTML邮件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发送富文本邮件"><span class="nav-text">发送富文本邮件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发送附件邮件"><span class="nav-text">发送附件邮件</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Xiao Zhuang"
+    src="/images/cao.jpg">
+  <p class="site-author-name" itemprop="name">Xiao Zhuang</p>
+  <div class="site-description" itemprop="description">小试牛刀</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" title="GitHub &rarr; https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1624611910@qq.com" title="E-Mail &rarr; mailto:1624611910@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://cy-blogs.cn" title="https://cy-blogs.cn" rel="noopener" target="_blank">laochen</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://v3u.cn/" title="https://v3u.cn/" rel="noopener" target="_blank">悦哥</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘国壮</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,0' opacity='0.5' zIndex='-1' count='150' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.2"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

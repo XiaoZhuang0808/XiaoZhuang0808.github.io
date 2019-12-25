@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="LGZ BLOG" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+
+  <meta name="description" content="Redis 哨兵机制什么是哨兵机制？ Redis 的哨兵（sentinel）系统用于管理多个 Redis 服务器，哨兵是redis集群架构中非常重要的一个组件，该系统执行以下三个任务：">
+<meta name="keywords" content="Redis哨兵机制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis哨兵机制">
+<meta property="og:url" content="http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/index.html">
+<meta property="og:site_name" content="LGZ BLOG">
+<meta property="og:description" content="Redis 哨兵机制什么是哨兵机制？ Redis 的哨兵（sentinel）系统用于管理多个 Redis 服务器，哨兵是redis集群架构中非常重要的一个组件，该系统执行以下三个任务：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/20171004163652928.jpg">
+<meta property="og:image" content="http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/%E8%84%91%E8%A3%82%E9%97%AE%E9%A2%98.jpg">
+<meta property="og:image" content="http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/160983038536.jpg">
+<meta property="og:image" content="http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/16098303.jpg">
+<meta property="og:image" content="http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/16098303d31754.jpg">
+<meta property="og:image" content="http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/20171004170405127.jpg">
+<meta property="og:updated_time" content="2019-12-24T13:31:39.342Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis哨兵机制">
+<meta name="twitter:description" content="Redis 哨兵机制什么是哨兵机制？ Redis 的哨兵（sentinel）系统用于管理多个 Redis 服务器，哨兵是redis集群架构中非常重要的一个组件，该系统执行以下三个任务：">
+<meta name="twitter:image" content="http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/20171004163652928.jpg">
+
+<link rel="canonical" href="http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Redis哨兵机制 | LGZ BLOG</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LGZ BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Action is the proper fruit of knowledge</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cao.jpg">
+      <meta itemprop="name" content="Xiao Zhuang">
+      <meta itemprop="description" content="小试牛刀">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LGZ BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis哨兵机制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-08-11 09:22:13" itemprop="dateCreated datePublished" datetime="2018-08-11T09:22:13+08:00">2018-08-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Redis-哨兵机制"><a href="#Redis-哨兵机制" class="headerlink" title="Redis 哨兵机制"></a>Redis 哨兵机制</h1><h3 id="什么是哨兵机制？"><a href="#什么是哨兵机制？" class="headerlink" title="什么是哨兵机制？"></a>什么是哨兵机制？</h3><ul>
+<li><p>Redis 的哨兵（sentinel）系统用于管理多个 Redis 服务器，<strong>哨兵是redis集群架构中非常重要的一个组件</strong>，该系统执行以下三个任务：</p>
+<a id="more"></a>
+
+<ul>
+<li><strong>监控（Monitoring）</strong>：哨兵（sentinel）会不断地检查你的 Master 和Slave 是否运作正常。</li>
+<li><strong>提醒（Notification）</strong>：当别监控的某个 Redis 出现问题时，哨兵（sentinel）可以通过 API 向管理员或者其他应用程序发送通知。</li>
+<li><strong>自动故障迁移（Automatic failover）</strong>：当一个Master 不能正常工作时，哨兵（sentinel）会开始一次自动故障迁移操作，它会将失效 Master 的其中一个 Slave 升级为新的 Master，并让失效 Master 的其他 Slave 改为复制新的 Master；当客户端视图连接失败的 Master时，集群也会向客户端返回新 Master 的地址，使得集群可以使用 Master 代替失效 Master。</li>
+</ul>
+</li>
+<li><p><strong>哨兵（sentinel）是一个分布式系统，作为一个哨兵集群去运行的，相互协同工作，你可以在一个架构中运行多个哨兵（sentinel）进程</strong></p>
+<blockquote>
+<p>​        (1)故障转移时，判断一个master node宕机了，需要大部分哨兵都同意才行，涉及到分布式选举问题。<br>​         (2)及时部分哨兵节点挂掉了，哨兵集群还是能正常工作的，因为如果一个作为高可用机制重要组成部分的故障转移系统本身就是单点，那么就不靠谱。        </p>
+<p>​        这些进程使用留言协议（gossipprotocols）来接收关于Master 是否下线的信息，并使用投票协议 （agreementprotocols）来决定是否执行自动故障迁移，以及选择哪个 Slave 作为新的 Master。</p>
+<p>​        每个哨兵（sentinel）会向其它哨兵（sentinel）、master、slave<strong>定时</strong>发送消息，以确认对方是否 <strong>“活“ **着，如果发现对方在指定时间（可配置）内未响应，则暂时认为对方已挂（所谓的</strong>”主观认为冗机“**Subjective Down,简称sdown)）</p>
+<p>​        若<strong>“哨兵群”</strong>中的多数据sentinel，都报告某一 master 没响应，系统才认为该 master <strong>“彻底死亡”</strong>(即:客观上的真正down机,Objective Down,简称odown),通过一定的vote算法,从剩下的slave节点中,选一台提升为master,然后自动修改相关配置。</p>
+<p>​         虽然<strong>哨兵(sentinel) *<em>释出为一个单独的可执行文件 *</em>redis-sentinel **,但实际上它只是一个运行在特殊模式下的 Redis 服务器，你可以在启动一个普通 Redis 服务器时通过给定</strong> –sentinel** 选项来启动<strong>哨兵(sentinel)</strong>。</p>
+</blockquote>
+<p>​         哨兵(sentinel) 的一些设计思路和zookeeper非常类似</p>
+<p><img src="/2018/08/11/Redis哨兵机制/20171004163652928.jpg" alt></p>
+</li>
+</ul>
+<h3 id="哨兵的核心知识"><a href="#哨兵的核心知识" class="headerlink" title="哨兵的核心知识"></a>哨兵的核心知识</h3><hr>
+<ul>
+<li><p>哨兵至少需要3个实例，来保证自己的健壮性。</p>
+</li>
+<li><p>哨兵+redis主从的部署架构，是不会保证数据零丢失的，只能保证redis集群的高可用性</p>
+</li>
+<li><p>对于哨兵+redis主从这种复杂的部署架构，尽量在测试环境和生产环境，都进行充分的测试和演练。</p>
+</li>
+</ul>
+<h3 id="redis哨兵主备切换的数据丢失问题"><a href="#redis哨兵主备切换的数据丢失问题" class="headerlink" title="redis哨兵主备切换的数据丢失问题"></a>redis哨兵主备切换的数据丢失问题</h3><hr>
+<p>两种丢失情况：</p>
+<ul>
+<li><p>异步复制导致的数据丢失</p>
+<blockquote>
+<p>​        因为master-&gt;slave的复制是异步的，所 以可能有部分数据还没复制到slave，master就宕机了，这些数据就丢失了。</p>
+</blockquote>
+</li>
+<li><p>脑裂导致的数据丢失</p>
+<blockquote>
+<p>​        脑裂，也就是说，某个master所在机器 突然脱离了正常的网络，跟其他slave机器不能连接，但是实际上master还运行着<br> ​        这个时候，集群中就会出现两个master。<br> ​        此时虽然某个slave被切换成了master，但是可能client还没来得及切换到新的master，还继续写向旧master数据可能就会丢失。<br> ​        因此master在恢复的时候，会被作为一个slave挂到新的master上，自己的数据会被清空，从新的master复制数据</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="解决异步复制和脑裂导致的数据丢失"><a href="#解决异步复制和脑裂导致的数据丢失" class="headerlink" title="解决异步复制和脑裂导致的数据丢失"></a>解决异步复制和脑裂导致的数据丢失</h3><hr>
+<p>min-slaves-to-write 1<br> min-slaves-max-lag 10<br> 要求至少有1个slave，数据复制和同步的延迟不能超过10秒<br> 如果说一旦所有slave，数据复制和同步的延迟都超过了10秒钟，那么这个时候，master就不会再接收任何请求了。<br> （1）减少异步复制的数据丢失<br> 有了min-slaves-max-lag这个配置，就可以确保说，一旦slave复制数据和ack延时太长，就认为可能master宕机后损失的数据太多了，那么就拒绝写请求，这样可以把master宕机时由于部分数据未同步到slave导致的数据丢失降低的可控范围内<br> （2）减少脑裂的数据丢失<br> 如果一个master出现了脑裂，跟其他slave丢了连接，那么上面两个配置可以确保说，如果不能继续给指定数量的slave发送数据，而且slave超过10秒没有给自己ack消息，那么就直接拒绝客户端的写请求<br> 这样脑裂后的旧master就不会接受client的新数据，也就避免了数据丢失<br> 上面的配置就确保了，如果跟任何一个slave丢了连接，在10秒后发现没有slave给自己ack，那么就拒绝新的写请求<br> 因此在脑裂场景下，最多就丢失10秒的数据</p>
+<p><img src="/2018/08/11/Redis哨兵机制/%E8%84%91%E8%A3%82%E9%97%AE%E9%A2%98.jpg" alt></p>
+<p>集群脑裂导致的数据丢失问题.png</p>
+<p><img src="/2018/08/11/Redis哨兵机制/160983038536.jpg" alt></p>
+<p>脑裂导致数据丢失的问题如何降低损失.png</p>
+<p><img src="/2018/08/11/Redis哨兵机制/16098303.jpg" alt></p>
+<p>异步复制导致的数据丢失问题.png</p>
+<p><img src="/2018/08/11/Redis哨兵机制/16098303d31754.jpg" alt></p>
+<h3 id="哨兵模式的配置修改"><a href="#哨兵模式的配置修改" class="headerlink" title="哨兵模式的配置修改"></a>哨兵模式的配置修改</h3><hr>
+<ul>
+<li>实现步骤<ul>
+<li>拷贝到etc目录<ul>
+<li><strong>cp sentinel.conf /usr/local/redis/etc</strong></li>
+</ul>
+</li>
+<li>修改sentinel.conf配置文件<ul>
+<li><strong>sentinel monitor mymast 192.168.110.133 6379 1</strong> #主节点 名称 IP 端口号 选举次数</li>
+<li>#配置主服务器的密码(如没设置密码，可以省略)<br>  <strong>sentinel auth-pass mymaster 123456</strong> </li>
+</ul>
+</li>
+<li>修改心跳检测 5000毫秒<ul>
+<li><strong>sentinel down-after-milliseconds mymaster 5000</strong></li>
+</ul>
+</li>
+<li>做多多少合格节点<ul>
+<li><strong>sentinel parallel-syncs mymaster 2</strong></li>
+</ul>
+</li>
+<li>启动哨兵模式<ul>
+<li><strong>./redis-server /usr/local/redis/etc/sentinel.conf –sentinel &amp;</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>注意：</p>
+<p>1.当启动哨兵模式之后，如果你的master服务器宕机之后，哨兵自动会在从redis服务器里面 投票选举一个master主服务器出来；这个主服务器也可以进行<strong>读写</strong>操作！</p>
+<p>2.如果之前宕机的主服务器已经修好，可以正式运行了。那么这个服务器只能进行<strong>读</strong>的操作，会自动跟随由哨兵选举出来的新服务器！</p>
+<p>3.大家可以进入./redis-cli，输入<strong>info，</strong>查看你的状态信息；</p>
+</blockquote>
+<p><img src="/2018/08/11/Redis哨兵机制/20171004170405127.jpg" alt></p>
+<h3 id="哨兵-Sentinel-总结"><a href="#哨兵-Sentinel-总结" class="headerlink" title="哨兵(Sentinel)总结"></a>哨兵(Sentinel)总结</h3><blockquote>
+<p>1、<strong>Sentinel</strong>的作用：</p>
+<p>A、Master 状态监测</p>
+<p>B、如果Master 异常，则会进行Master-slave 转换，将其中一个Slave作为Master，将之前的Master作为Slave </p>
+<p>C、Master-Slave切换后，master_redis.conf、slave_redis.conf和sentinel.conf的内容都会发生改变，即master_redis.conf中会多一行slaveof的配置，sentinel.conf的监控目标会随之调换 </p>
+<p>2、<strong>Sentinel</strong>的工作方式<strong>:</strong></p>
+<p>1)：每个Sentinel以每秒钟一次的频率向它所知的Master，Slave以及其他 Sentinel 实例发送一个 PING 命令。</p>
+<p>2)：如果一个实例（instance）距离最后一次有效回复 PING 命令的时间超过 down-after-milliseconds 选项所指定的值， 则这个实例会被 Sentinel 标记为主观下线。 </p>
+<p>3)：如果一个Master被标记为主观下线，则正在监视这个Master的所有 Sentinel 要以每秒一次的频率确认Master的确进入了主观下线状态。 </p>
+<p>4)：当有足够数量的 Sentinel（大于等于配置文件指定的值）在指定的时间范围内确认Master的确进入了主观下线状态， 则Master会被标记为客观下线 。</p>
+<p>5)：在一般情况下， 每个 Sentinel 会以每 10 秒一次的频率向它已知的所有Master，Slave发送 INFO 命令 。</p>
+<p>6)：当Master被 Sentinel 标记为客观下线时，Sentinel 向下线的 Master 的所有 Slave 发送 INFO 命令的频率会从 10 秒一次改为每秒一次 。</p>
+<p>7)：若没有足够数量的 Sentinel 同意 Master 已经下线， Master 的客观下线状态就会被移除。 </p>
+<p>若 Master 重新向 Sentinel 的 PING 命令返回有效回复， Master 的主观下线状态就会被移除。</p>
+<p>最后，如果大家看不太懂，推荐大家看两个博客，就明白了！</p>
+<p>1.<a href="http://blog.csdn.net/zbw18297786698/article/details/52891695" target="_blank" rel="noopener">http://blog.csdn.net/zbw18297786698/article/details/52891695</a><br>2.<a href="http://blog.csdn.net/candy_rainbow/article/details/52842402" target="_blank" rel="noopener">http://blog.csdn.net/candy_rainbow/article/details/52842402</a>    </p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xiao Zhuang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/" title="Redis哨兵机制">http://xiaozhuang.tech/2018/08/11/Redis哨兵机制/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <div>
+        
+          <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+        
+      </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Redis哨兵机制/" rel="tag"># Redis哨兵机制</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2017/09/15/javascript/" rel="next" title="Javascript">
+                  <i class="fa fa-chevron-left"></i> Javascript
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2018/10/16/HayStack全文检索在Django中的应用/" rel="prev" title="HayStack全文检索在Django中的应用">
+                  HayStack全文检索在Django中的应用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-哨兵机制"><span class="nav-text">Redis 哨兵机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是哨兵机制？"><span class="nav-text">什么是哨兵机制？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#哨兵的核心知识"><span class="nav-text">哨兵的核心知识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redis哨兵主备切换的数据丢失问题"><span class="nav-text">redis哨兵主备切换的数据丢失问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决异步复制和脑裂导致的数据丢失"><span class="nav-text">解决异步复制和脑裂导致的数据丢失</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#哨兵模式的配置修改"><span class="nav-text">哨兵模式的配置修改</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#哨兵-Sentinel-总结"><span class="nav-text">哨兵(Sentinel)总结</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Xiao Zhuang"
+    src="/images/cao.jpg">
+  <p class="site-author-name" itemprop="name">Xiao Zhuang</p>
+  <div class="site-description" itemprop="description">小试牛刀</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" title="GitHub &rarr; https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1624611910@qq.com" title="E-Mail &rarr; mailto:1624611910@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://cy-blogs.cn" title="https://cy-blogs.cn" rel="noopener" target="_blank">laochen</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://v3u.cn/" title="https://v3u.cn/" rel="noopener" target="_blank">悦哥</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘国壮</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,0' opacity='0.5' zIndex='-1' count='150' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.2"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
