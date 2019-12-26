@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="LGZ BLOG" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+
+  <meta name="description" content="发布者与订阅者（pub/sub）发布和订阅pub/sub，订阅者负责订阅频道，发送者负责像频道发送二进制字符串消息，每当有消息发布到订阅的这个频道，那么所有的订阅者都可以收到这个消息，发布订阅也是像是我们生活中的电台，订阅者可以订阅收听多个电台，而发送者可以再任何电台发送消息">
+<meta name="keywords" content="Redis 发布者与订阅者,键空间事件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis 发布者与订阅者,键空间事件">
+<meta property="og:url" content="http://xiaozhuang.tech/2018/10/16/Redis发布者与订阅者，键空间事件/index.html">
+<meta property="og:site_name" content="LGZ BLOG">
+<meta property="og:description" content="发布者与订阅者（pub/sub）发布和订阅pub/sub，订阅者负责订阅频道，发送者负责像频道发送二进制字符串消息，每当有消息发布到订阅的这个频道，那么所有的订阅者都可以收到这个消息，发布订阅也是像是我们生活中的电台，订阅者可以订阅收听多个电台，而发送者可以再任何电台发送消息">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://xiaozhuang.tech/2018/10/16/Redis发布者与订阅者，键空间事件/%E9%94%AE%E8%BF%87%E6%9C%9F%E4%BA%8B%E4%BB%B6%E9%80%9A%E7%9F%A5.gif">
+<meta property="og:updated_time" content="2019-12-26T07:20:06.472Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis 发布者与订阅者,键空间事件">
+<meta name="twitter:description" content="发布者与订阅者（pub/sub）发布和订阅pub/sub，订阅者负责订阅频道，发送者负责像频道发送二进制字符串消息，每当有消息发布到订阅的这个频道，那么所有的订阅者都可以收到这个消息，发布订阅也是像是我们生活中的电台，订阅者可以订阅收听多个电台，而发送者可以再任何电台发送消息">
+<meta name="twitter:image" content="http://xiaozhuang.tech/2018/10/16/Redis发布者与订阅者，键空间事件/%E9%94%AE%E8%BF%87%E6%9C%9F%E4%BA%8B%E4%BB%B6%E9%80%9A%E7%9F%A5.gif">
+
+<link rel="canonical" href="http://xiaozhuang.tech/2018/10/16/Redis发布者与订阅者，键空间事件/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Redis 发布者与订阅者,键空间事件 | LGZ BLOG</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LGZ BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Action is the proper fruit of knowledge</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaozhuang.tech/2018/10/16/Redis发布者与订阅者，键空间事件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cao.jpg">
+      <meta itemprop="name" content="Xiao Zhuang">
+      <meta itemprop="description" content="小试牛刀">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LGZ BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis 发布者与订阅者,键空间事件
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-16 12:25:37" itemprop="dateCreated datePublished" datetime="2018-10-16T12:25:37+08:00">2018-10-16</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="发布者与订阅者（pub-sub）"><a href="#发布者与订阅者（pub-sub）" class="headerlink" title="发布者与订阅者（pub/sub）"></a>发布者与订阅者（pub/sub）</h2><p>发布和订阅<code>pub/sub</code>，订阅者负责订阅频道，发送者负责像频道发送二进制字符串消息，每当有消息发布到订阅的这个频道，那么所有的订阅者都可以收到这个消息，发布订阅也是像是我们生活中的电台，订阅者可以订阅收听多个电台，而发送者可以再任何电台发送消息</p><a id="more"></a>
+<h3 id="发布，订阅常用命令"><a href="#发布，订阅常用命令" class="headerlink" title="发布，订阅常用命令"></a>发布，订阅常用命令</h3><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SUBSCRIBE CHANNLE</td>
+<td>订阅给定的一个或多个频道</td>
+</tr>
+<tr>
+<td>UNSUBSCRIBE CHANNLE</td>
+<td>退订一个或多个频道，如果没有指定具体退订的频道，那么是全部退订</td>
+</tr>
+<tr>
+<td>PSUBSCRIBE PATTERN</td>
+<td>订阅与给定模式相匹配的所有频道</td>
+</tr>
+<tr>
+<td>PUNSUBSCRIBE PATTERN</td>
+<td>退订给定的模式相匹配的频道，未指定，则退订所有</td>
+</tr>
+<tr>
+<td>PUBLISH CHANNLE MESSAGE</td>
+<td>向给定频道发送消息</td>
+</tr>
+</tbody></table>
+<h2 id="键空间事件"><a href="#键空间事件" class="headerlink" title="键空间事件"></a>键空间事件</h2><h3 id="键空间事件通知"><a href="#键空间事件通知" class="headerlink" title="键空间事件通知"></a>键空间事件通知</h3><p>在<code>Redis</code>里面有一些事件，比如键<strong>到期</strong>、键被<strong>删除</strong>等。可以通过打开<code>redis</code>键空间事件通知来让 Redis 一旦触发这些事件的时候就往特定的<code>Channel</code>推一条消息</p>
+<h3 id="键事件通知配置"><a href="#键事件通知配置" class="headerlink" title="键事件通知配置"></a>键事件通知配置</h3><ul>
+<li>默认在<code>redis</code>中，键事件通知是不打开的，需要我们手动配置，具体的选项如下，默认他是个空字符串，代表关闭状态</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">notify-keyspace-events &quot;&quot;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项字符</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>K</td>
+<td>键空间通知，所有通知以<code>__keyspace@&lt;db&gt;__</code> 为前缀</td>
+</tr>
+<tr>
+<td>E</td>
+<td>键事件通知，所有通知以<code>__keyevent@&lt;db&gt;__</code> 为前缀</td>
+</tr>
+<tr>
+<td>g</td>
+<td><code>DEL</code>、<code>EXPIRE</code>、<code>RENAME</code>等类型无关的通用命令的通知</td>
+</tr>
+<tr>
+<td>$</td>
+<td>字符串命令的通知</td>
+</tr>
+<tr>
+<td>l</td>
+<td>列表命令的通知</td>
+</tr>
+<tr>
+<td>s</td>
+<td>集合命令的通知</td>
+</tr>
+<tr>
+<td>h</td>
+<td>哈希命令的通知</td>
+</tr>
+<tr>
+<td>z</td>
+<td>有序集合命令的通知</td>
+</tr>
+<tr>
+<td>x</td>
+<td>过期事件：每当有过期键被删除时发送</td>
+</tr>
+<tr>
+<td>e</td>
+<td>驱逐<code>(evict)</code>事件：每当有键因为<code>maxmemory</code>政策而被删除时发送</td>
+</tr>
+<tr>
+<td>A</td>
+<td>参数<code>g$lshzxe</code>的别名</td>
+</tr>
+</tbody></table>
+<p>注意，该选项的值中至少需要包含K或者E，否则不会发布任何事件。比如，如果需要开启针对列表的keyspace事件通知，则该选项需要配置为“Kl”； </p>
+<h3 id="键空间和键事件"><a href="#键空间和键事件" class="headerlink" title="键空间和键事件"></a>键空间和键事件</h3><blockquote>
+<p>对于每个修改数据库的操作，键空间通知都会发送两种不同类型的事件</p>
+<p>比如说，对<code>0</code>号数据库的键<code>mykey</code>执行<code>DEL</code>命令时， 系统将分发两条消息， 相当于执行以下两个<code>PUBLISH</code>命令</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PUBLISH __keyspace@0__:mykey del</span><br><span class="line">PUBLISH __keyevent@0__:del mykey</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>__keyspace@0__:mykey</code>：接收<code>0</code>号数据库中所有修改键<code>mykey</code>的事件</li>
+<li><code>__keyevent@0__:del</code>：接收<code>0</code>号数据库中所有执行<code>del</code>命令的键</li>
+</ul>
+<blockquote>
+<p><code>keyspace</code>为前缀的频道被称为键空间通知<code>key-space notification</code></p>
+</blockquote>
+<blockquote>
+<p><code>keyevent</code>为前缀的频道则被称为键事件通知<code>key-event notification</code></p>
+</blockquote>
+<ul>
+<li>订阅<strong>键空间频道</strong>，监控被执行事件的键，如监控<code>mykey</code>；那么此时将接收到该键所对应的事件：<code>del</code></li>
+<li>订阅<strong>键事件频道</strong>，监控某个事件，如<code>del</code>；那么<code>del</code>事件触发时，订阅者收到：<code>mykey</code></li>
+</ul>
+<h3 id="过期的键事件通知"><a href="#过期的键事件通知" class="headerlink" title="过期的键事件通知"></a>过期的键事件通知</h3><ul>
+<li>过期的键事件通知常用在订单过期通知等场景下，此时只需要订阅对应<strong>过期事件</strong>的频道，当某键触发过期事件时，即可接受到对应<strong>过期键</strong>的消息</li>
+<li><code>redis</code>配置如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">notify-keyspace-events &quot;Ex&quot;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>Python</code>代码的简单示范，订阅过期频道</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import redis</span><br><span class="line">import time</span><br><span class="line">redis = redis.Redis(host=&apos;123.57.61.168&apos;, port=6379)</span><br><span class="line">pubsub = redis.pubsub()</span><br><span class="line">pubsub.psubscribe(&apos;__keyevent@0__:expired&apos;) # 订阅过期事件频道</span><br><span class="line">print(&apos;Starting message loop&apos;)</span><br><span class="line">while True:</span><br><span class="line">    try:</span><br><span class="line">        message = pubsub.get_message()</span><br><span class="line">        if message:</span><br><span class="line">            print(message)</span><br><span class="line">        else:</span><br><span class="line">            time.sleep(0.01)</span><br><span class="line">    except KeyboardInterrupt:</span><br><span class="line">        # CTRL + C</span><br><span class="line">        break</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>那么当此时执行此段代码，另起<code>redis</code>客户端，设置一个可以过期的<code>key</code>值，来看一下效果</li>
+</ul>
+<p><img src="/2018/10/16/Redis发布者与订阅者，键空间事件/%E9%94%AE%E8%BF%87%E6%9C%9F%E4%BA%8B%E4%BB%B6%E9%80%9A%E7%9F%A5.gif" alt="键过期事件通知"></p>
+<h3 id="不同命令产生的事件通知"><a href="#不同命令产生的事件通知" class="headerlink" title="不同命令产生的事件通知"></a>不同命令产生的事件通知</h3><ul>
+<li>DEL 命令为每个被删除的键产生一个 del 事件；</li>
+<li>RENAME 产生两个事件：为源键产生一个 rename_from 事件，并为目标键产生一个 rename_to 事件；</li>
+<li>EXPIRE命令，在设置键的过期时间时产生一个 expire事件；当键因过期而被删除时，产生一个 expired事件；</li>
+<li>SORT命令，在带有 STORE 参数时产生一个 sortstore事件。如果 STORE 指示的用于保存排序结果的键已经存在，则原键会被删除，因此还会产生一个 del 事件；</li>
+<li>SET 以及它的所有变种(SETEX、SETNX和GETSET)都产生set事件。另外，SETEX命令还会产生expire 事件；</li>
+<li>MSET 命令，为每个键产生一个 set 事件；</li>
+<li>SETRANGE 产生一个 setrange 事件；</li>
+<li>INCR 、DECR、INCRBY和DECRBY都产生 incrby 事件；</li>
+<li>INCRBYFLOAT产生incrbyfloat事件；</li>
+<li>APPEND产生append事件；</li>
+<li>LPUSH和LPUSHX都产生单个 lpush 事件，即使有多个输入元素时，也是如此；</li>
+<li>RPUSH 和 RPUSHX 都产生单个rpush事件，即使有多个输入元素时，也是如此；</li>
+<li>RPOP 产生 rpop 事件，如果被弹出的元素是列表的最后一个元素，那么还会产生一个 del 事件；</li>
+<li>LPOP 产生 lpop 事件，如果被弹出的元素是列表的最后一个元素，那么还会产生一个 del 事件；</li>
+<li>LINSERT 产生一个 linsert 事件；</li>
+<li>LSET 产生一个 lset 事件；</li>
+<li>LREM产生一个lrem事件，如果该命令执行之后，列表键被清空，则还会产生一个 del 事件；</li>
+<li>LTRIM 产生一个ltrim事件，如果该命令执行之后，列表键被清空，则还会产生一个 del 事件；</li>
+<li>RPOPLPUSH 和 BRPOPLPUSH 产生一个 rpop 事件，以及一个 lpush 事件。两个命令都保证rpop事件在 lpush 事件之前发出。如果弹出元素之后，列表键被清空，则还会产生一个 del 事件；</li>
+<li>HSET 、 HSETNX 和 HMSET 都只产生一个 hset 事件；</li>
+<li>HINCRBY 产生一个 hincrby 事件；</li>
+<li>HINCRBYFLOAT 产生一个 hincrbyfloat 事件；</li>
+<li>HDEL 产生一个 hdel 通知。如果执行该命令之后，哈希键被清空，则还会产生一个del事件；</li>
+<li>SADD 产生一个 sadd 事件，即使有多个输入元素时，也是如此；</li>
+<li>SREM 产生一个 srem 事件，如果执行该命令之后，集合键被清空，则还会产生一个 del 事件；</li>
+<li>SMOVE 为源键产生一个 srem 事件，并为目标键产生一个sadd 事件；</li>
+<li>SPOP 产生一个 spop 事件。如果执行该命令之后，集合键被清空，则还会产生一个 del 事件；</li>
+<li>SINTERSTORE、SUNIONSTORE和SDIFFSTORE分别产生 sinterstore、sunionostore和sdiffstore 三种事件。如果用于保存结果的键已经存在，则还会产生一个 del 事件；</li>
+<li>ZINCR产生一个 zincr 事件；</li>
+<li>ZADD 产生一个 zadd事件，即使有多个输入元素时，也是如此；</li>
+<li>ZREM 产生一个 zrem 通知，即使有多个输入元素时，也是如此。如果执行 ZREM 之后，有序集合键被清空，则还会产生一个 del 事件；</li>
+<li>ZREMEBYSCORE 产生一个 zrembyscore事件，如果用于保存结果的键已经存在，则还会产生一个 del 事件。</li>
+<li>ZREMBYRANK 产生一个 zrembyrank事件，如果用于保存结果的键已经存在，则还会产生一个 del 事件。</li>
+<li>ZINTERSTORE 和 ZUNIONSTORE 分别产生 zinterstore 和 zunionstore 两种事件。如果用于保存结果的键已经存在，那么还会产生一个 del 事件。</li>
+<li>每当一个键因为过期而被删除时，产生一个 expired 事件。</li>
+<li>每当一个键因为 maxmemory策略而被删除并回收内存时，产生一个 evicted 事件。</li>
+</ul>
+<p>注意：所有命令都只在键真的被改动了之后，才会产生事件通知。比如，当srem命令试图删除不存在于集合的元素时，删除操作执行失败，因为没有真正的改动键，所以这一操作不会发送通知。</p>
+<h3 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h3><p><strong>1：Redis发布所有通知，客户端A订阅所有消息：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config set notify-keyspace-events KEA</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; psubscribe key*@0:*</span><br><span class="line">Reading messages... (press Ctrl-C to quit)</span><br><span class="line">1) &quot;psubscribe&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) (integer) 1</span><br></pre></td></tr></table></figure>
+
+<p>然后，在客户端B上执行set和del命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set msg &quot;hello&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; del msg</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; del msg</span><br><span class="line">(integer) 0</span><br></pre></td></tr></table></figure>
+
+<p>然后客户端A的打印如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;set&quot;</span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;__key@0:*&quot;</span><br><span class="line">3) &quot;keyevent@0__:set&quot;</span><br><span class="line">4) &quot;msg&quot;</span><br><span class="line"></span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;del&quot;</span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;__key@0:*&quot;</span><br><span class="line">3) &quot;keyevent@0__:del&quot;</span><br><span class="line">4) &quot;msg&quot;</span><br></pre></td></tr></table></figure>
+
+<p> 可见，针对每一个操作，客户端A都收到了两种消息，分别是keyspace和keyevent消息。</p>
+<p><strong>2：使Redis仅发布keyspace通知，而客户端A订阅所有消息类型：</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config set notify-keyspace-events KA</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; psubscribe key*@0:*</span><br><span class="line">Reading messages... (press Ctrl-C to quit)</span><br><span class="line">1) &quot;psubscribe&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) (integer) 1</span><br></pre></td></tr></table></figure>
+
+<p>在客户端B上执行，与上面同样的步骤。此时，客户端A上的打印：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;set&quot;</span><br><span class="line"></span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;del&quot;</span><br></pre></td></tr></table></figure>
+
+<p>可见，尽管客户端A订阅了所有消息，但是Redis仅发布了keyspace事件。而且，在客户端B上执行了两次del操作，而只有第一个del成功执行了，从而产生了一个事件。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xiao Zhuang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaozhuang.tech/2018/10/16/Redis发布者与订阅者，键空间事件/" title="Redis 发布者与订阅者,键空间事件">http://xiaozhuang.tech/2018/10/16/Redis发布者与订阅者，键空间事件/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <div>
+        
+          <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+        
+      </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Redis-发布者与订阅者-键空间事件/" rel="tag"># Redis 发布者与订阅者,键空间事件</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2018/10/16/HayStack全文检索在Django中的应用/" rel="next" title="HayStack全文检索在Django中的应用">
+                  <i class="fa fa-chevron-left"></i> HayStack全文检索在Django中的应用
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2018/12/12/Linux基础操作/" rel="prev" title="Linux基础操作">
+                  Linux基础操作 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#发布者与订阅者（pub-sub）"><span class="nav-text">发布者与订阅者（pub/sub）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#发布，订阅常用命令"><span class="nav-text">发布，订阅常用命令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#键空间事件"><span class="nav-text">键空间事件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#键空间事件通知"><span class="nav-text">键空间事件通知</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#键事件通知配置"><span class="nav-text">键事件通知配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#键空间和键事件"><span class="nav-text">键空间和键事件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#过期的键事件通知"><span class="nav-text">过期的键事件通知</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不同命令产生的事件通知"><span class="nav-text">不同命令产生的事件通知</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实践"><span class="nav-text">实践</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Xiao Zhuang"
+    src="/images/cao.jpg">
+  <p class="site-author-name" itemprop="name">Xiao Zhuang</p>
+  <div class="site-description" itemprop="description">小试牛刀</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" title="GitHub &rarr; https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1624611910@qq.com" title="E-Mail &rarr; mailto:1624611910@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://cy-blogs.cn" title="https://cy-blogs.cn" rel="noopener" target="_blank">laochen</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://v3u.cn/" title="https://v3u.cn/" rel="noopener" target="_blank">悦哥</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘国壮</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,0' opacity='0.5' zIndex='-1' count='150' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.2"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

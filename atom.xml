@@ -101,6 +101,27 @@
   </entry>
   
   <entry>
+    <title>Redis 发布者与订阅者,键空间事件</title>
+    <link href="http://xiaozhuang.tech/2018/10/16/Redis%E5%8F%91%E5%B8%83%E8%80%85%E4%B8%8E%E8%AE%A2%E9%98%85%E8%80%85%EF%BC%8C%E9%94%AE%E7%A9%BA%E9%97%B4%E4%BA%8B%E4%BB%B6/"/>
+    <id>http://xiaozhuang.tech/2018/10/16/Redis%E5%8F%91%E5%B8%83%E8%80%85%E4%B8%8E%E8%AE%A2%E9%98%85%E8%80%85%EF%BC%8C%E9%94%AE%E7%A9%BA%E9%97%B4%E4%BA%8B%E4%BB%B6/</id>
+    <published>2018-10-16T04:25:37.000Z</published>
+    <updated>2019-12-26T07:20:06.472Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;发布者与订阅者（pub-sub）&quot;&gt;&lt;a href=&quot;#发布者与订阅者（pub-sub）&quot; class=&quot;headerlink&quot; title=&quot;发布者与订阅者（pub/sub）&quot;&gt;&lt;/a&gt;发布者与订阅者（pub/sub）&lt;/h2&gt;&lt;p&gt;发布和订阅&lt;code&gt;pub/sub&lt;/code&gt;，订阅者负责订阅频道，发送者负责像频道发送二进制字符串消息，每当有消息发布到订阅的这个频道，那么所有的订阅者都可以收到这个消息，发布订阅也是像是我们生活中的电台，订阅者可以订阅收听多个电台，而发送者可以再任何电台发送消息&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Redis" scheme="http://xiaozhuang.tech/categories/Redis/"/>
+    
+    
+      <category term="Redis 发布者与订阅者,键空间事件" scheme="http://xiaozhuang.tech/tags/Redis-%E5%8F%91%E5%B8%83%E8%80%85%E4%B8%8E%E8%AE%A2%E9%98%85%E8%80%85-%E9%94%AE%E7%A9%BA%E9%97%B4%E4%BA%8B%E4%BB%B6/"/>
+    
+  </entry>
+  
+  <entry>
     <title>HayStack全文检索在Django中的应用</title>
     <link href="http://xiaozhuang.tech/2018/10/16/HayStack%E5%85%A8%E6%96%87%E6%A3%80%E7%B4%A2%E5%9C%A8Django%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/"/>
     <id>http://xiaozhuang.tech/2018/10/16/HayStack%E5%85%A8%E6%96%87%E6%A3%80%E7%B4%A2%E5%9C%A8Django%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/</id>
@@ -144,6 +165,33 @@
     
     
       <category term="Redis哨兵机制" scheme="http://xiaozhuang.tech/tags/Redis%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Linux四剑客</title>
+    <link href="http://xiaozhuang.tech/2018/08/08/Linux%E5%9B%9B%E5%89%91%E5%AE%A2/"/>
+    <id>http://xiaozhuang.tech/2018/08/08/Linux%E5%9B%9B%E5%89%91%E5%AE%A2/</id>
+    <published>2018-08-08T04:34:00.000Z</published>
+    <updated>2019-12-25T03:46:58.115Z</updated>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;有四个剑客，他们很厉害&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2 id=&quot;Find&quot;&gt;&lt;a href=&quot;#Find&quot; class=&quot;headerlink&quot; title=&quot;Find&quot;&gt;&lt;/a&gt;Find&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;查询命令，就是&lt;code&gt;find&lt;/code&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;usage: find [-H | -L | -P] [-EXdsx] [-f path] path ... [expression]&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;       find [-H | -L | -P] [-EXdsx] -f path [path ...] [expression]&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="Linux" scheme="http://xiaozhuang.tech/categories/Linux/"/>
+    
+    
+      <category term="Linux" scheme="http://xiaozhuang.tech/tags/Linux/"/>
     
   </entry>
   
@@ -250,6 +298,64 @@
     
     
       <category term="Mysql" scheme="http://xiaozhuang.tech/tags/Mysql/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>python脚本向Mysql插入一亿条测试数据</title>
+    <link href="http://xiaozhuang.tech/2016/08/07/python%E8%84%9A%E6%9C%AC%E5%90%91Mysql%E6%8F%92%E5%85%A5%E4%B8%80%E4%BA%BF%E6%9D%A1%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE/"/>
+    <id>http://xiaozhuang.tech/2016/08/07/python%E8%84%9A%E6%9C%AC%E5%90%91Mysql%E6%8F%92%E5%85%A5%E4%B8%80%E4%BA%BF%E6%9D%A1%E6%B5%8B%E8%AF%95%E6%95%B0%E6%8D%AE/</id>
+    <published>2016-08-07T01:22:00.000Z</published>
+    <updated>2019-12-25T08:43:20.822Z</updated>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;当我想要测试mysql的诸多索引时，需要用到大量的数据，重复的。不重复的，int类型的，varchar类型的，时间类型的等等，咋办呢？当你看到这篇博文的时候，恭喜你来对地方啦。&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="Python" scheme="http://xiaozhuang.tech/categories/Python/"/>
+    
+    
+      <category term="Python" scheme="http://xiaozhuang.tech/tags/Python/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>nginx负载均衡</title>
+    <link href="http://xiaozhuang.tech/2016/03/23/nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/"/>
+    <id>http://xiaozhuang.tech/2016/03/23/nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/</id>
+    <published>2016-03-23T13:22:13.000Z</published>
+    <updated>2019-12-25T08:58:05.221Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;nginx负载均衡&quot;&gt;&lt;a href=&quot;#nginx负载均衡&quot; class=&quot;headerlink&quot; title=&quot;nginx负载均衡&quot;&gt;&lt;/a&gt;nginx负载均衡&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;轮询（默认）——每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器down掉，能自动剔除。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;weight ——指定轮询几率，weight和访问比率成正比，用于后端服务器性能不均的情况。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;ip_hash ——每个请求按访问ip的hash结果分配，这样每个访客固定访问一个后端服务器。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;backup——其它所有的非backup机器down或者忙的时候，请求backup机器。所以这台机器压力会最轻。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;down——表示单前的server暂时不参与负载&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;fair（第三方）按后端服务器的响应时间来分配请求，响应时间短的优先分配。与weight分配策略类似。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+    
+      <category term="Nginx" scheme="http://xiaozhuang.tech/categories/Nginx/"/>
+    
+    
+      <category term="Nginx" scheme="http://xiaozhuang.tech/tags/Nginx/"/>
     
   </entry>
   

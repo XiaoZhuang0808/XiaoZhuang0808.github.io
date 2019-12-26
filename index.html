@@ -626,7 +626,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block home" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://xiaozhuang.tech/2018/10/16/HayStack全文检索在Django中的应用/">
+    <link itemprop="mainEntityOfPage" href="http://xiaozhuang.tech/2018/10/16/Redis发布者与订阅者，键空间事件/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/cao.jpg">
@@ -640,7 +640,7 @@
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           
-            <a href="/2018/10/16/HayStack全文检索在Django中的应用/" class="post-title-link" itemprop="url">HayStack全文检索在Django中的应用</a>
+            <a href="/2018/10/16/Redis发布者与订阅者，键空间事件/" class="post-title-link" itemprop="url">Redis 发布者与订阅者,键空间事件</a>
         </h1>
 
         <div class="post-meta">
@@ -658,8 +658,8 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Django/" itemprop="url" rel="index">
-                    <span itemprop="name">Django</span>
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
                   </a>
                 </span>
             </span>
@@ -675,14 +675,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="全文检索"><a href="#全文检索" class="headerlink" title="全文检索"></a>全文检索</h2><p><a href="https://django-haystack.readthedocs.io/en/v2.4.1/tutorial.html" target="_blank" rel="noopener">官方文档</a></p>
-<blockquote>
-<p>全文检索就是针对所有内容进行动态匹配搜索的概念</p>
-<p>针对特定的关键词进行<strong>建立索引</strong>并<strong>精确匹配</strong>取出搜索结果，并且达到性能优化的目的</p>
-</blockquote>
+          <h2 id="发布者与订阅者（pub-sub）"><a href="#发布者与订阅者（pub-sub）" class="headerlink" title="发布者与订阅者（pub/sub）"></a>发布者与订阅者（pub/sub）</h2><p>发布和订阅<code>pub/sub</code>，订阅者负责订阅频道，发送者负责像频道发送二进制字符串消息，每当有消息发布到订阅的这个频道，那么所有的订阅者都可以收到这个消息，发布订阅也是像是我们生活中的电台，订阅者可以订阅收听多个电台，而发送者可以再任何电台发送消息</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2018/10/16/HayStack全文检索在Django中的应用/#more" rel="contents">
+              <a class="btn" href="/2018/10/16/Redis发布者与订阅者，键空间事件/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -706,7 +702,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -752,20 +748,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

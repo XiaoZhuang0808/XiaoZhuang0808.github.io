@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="LGZ BLOG" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+
+  <meta name="description" content="有四个剑客，他们很厉害  Find 查询命令，就是find  12usage: find [-H | -L | -P] [-EXdsx] [-f path] path ... [expression]       find [-H | -L | -P] [-EXdsx] -f path [path ...] [expression]">
+<meta name="keywords" content="Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux四剑客">
+<meta property="og:url" content="http://xiaozhuang.tech/2018/08/08/Linux四剑客/index.html">
+<meta property="og:site_name" content="LGZ BLOG">
+<meta property="og:description" content="有四个剑客，他们很厉害  Find 查询命令，就是find  12usage: find [-H | -L | -P] [-EXdsx] [-f path] path ... [expression]       find [-H | -L | -P] [-EXdsx] -f path [path ...] [expression]">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-25T03:46:58.115Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux四剑客">
+<meta name="twitter:description" content="有四个剑客，他们很厉害  Find 查询命令，就是find  12usage: find [-H | -L | -P] [-EXdsx] [-f path] path ... [expression]       find [-H | -L | -P] [-EXdsx] -f path [path ...] [expression]">
+
+<link rel="canonical" href="http://xiaozhuang.tech/2018/08/08/Linux四剑客/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Linux四剑客 | LGZ BLOG</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LGZ BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Action is the proper fruit of knowledge</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaozhuang.tech/2018/08/08/Linux四剑客/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cao.jpg">
+      <meta itemprop="name" content="Xiao Zhuang">
+      <meta itemprop="description" content="小试牛刀">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LGZ BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux四剑客
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-08-08 12:34:00" itemprop="dateCreated datePublished" datetime="2018-08-08T12:34:00+08:00">2018-08-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index">
+                    <span itemprop="name">Linux</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>有四个剑客，他们很厉害</p>
+</blockquote>
+<h2 id="Find"><a href="#Find" class="headerlink" title="Find"></a>Find</h2><blockquote>
+<p>查询命令，就是<code>find</code></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">usage: find [-H | -L | -P] [-EXdsx] [-f path] path ... [expression]</span><br><span class="line">       find [-H | -L | -P] [-EXdsx] -f path [path ...] [expression]</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<ul>
+<li>常用参数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">-name   	file		    				#查找名为file的文件；</span><br><span class="line">-type   	b/d/c/p/l/f			    #查是块设备、目录、字符设备、管道、符号链接、普通文件；</span><br><span class="line">-size     n[c]     		    		#查长度为n块[或n字节]的文件；</span><br><span class="line">-perm               					#按执行权限来查找；</span><br><span class="line">-user    	username   					#按文件属主来查找；</span><br><span class="line">-group   	groupname  					#按组来查找；</span><br><span class="line">-mtime    -n +n     					#按文件更改时间来查找文件，-n指n天以内，+n指n天以前；</span><br><span class="line">-atime    -n +n     			    #按文件访问时间来查找文件；</span><br><span class="line">-ctime    -n +n     			    #按文件创建时间来查找文件；</span><br><span class="line">-mmin     -n +n     			    #按文件更改时间来查找文件，-n指n分钟以内，+n指n分钟以前；</span><br><span class="line">-amin     -n +n     			    #按文件访问时间来查找文件；</span><br><span class="line">-cmin     -n +n     			    #按文件创建时间来查找文件；</span><br><span class="line">-nogroup            			    #查无有效属组的文件；</span><br><span class="line">-nouser             			    #查无有效属主的文件；</span><br><span class="line">-newer   	f1 !f2     			    #找文件，-n指n天以内，+n指n天以前；</span><br><span class="line">-depth              			    #使查找在进入子目录前先行查找完本目录；</span><br><span class="line">-fstype             			    #查更改时间比f1新但比f2旧的文件；</span><br><span class="line">-mount              			    #查文件时不跨越文件系统mount点；</span><br><span class="line">-follow             			    #如果遇到符号链接文件，就跟踪链接所指的文件；</span><br><span class="line">-cpio              						#查位于某一类型文件系统中的文件；</span><br><span class="line">-prune              			    #忽略某个目录；</span><br><span class="line">-maxdepth											#查找目录级别深度</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-name</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">find /home/ -name &apos;file&apos;</span><br><span class="line"># 查询home目录下文件名为file的文件</span><br><span class="line">find /home/ -name &apos;[a-z]*&apos;</span><br><span class="line"># 查找home目录下文件名以小写字母开头的文件</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-type</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">find /home/ -type d </span><br><span class="line"># 查找home目录下的目录</span><br><span class="line">find /home/ ! -type d</span><br><span class="line"># 查找home目录下的非目录</span><br><span class="line">find /home -type d | xargs chmod 755 -R</span><br><span class="line"># 查找home目录下的目录，并将这个目录里的文件的权限设置为755</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-size</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">find /home/ -size +1K</span><br><span class="line"># 查找home目录下文件大于1K的文件</span><br><span class="line">find /home/ -size -1M</span><br><span class="line"># 查找home目录下文件小于1M的文件</span><br><span class="line">find /home/ -size 10K</span><br><span class="line"># 查找home目录下文件等于10K的文件</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-perm</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">find /home/ -perm -775</span><br><span class="line"># 减号代表的意思是 比当前775更充足的权限 所有1的部分必须被匹配</span><br><span class="line">find /home/ -perm +001</span><br><span class="line"># 加号代表的意思是 只要有权限位置符合查询条件即可</span><br><span class="line">find /home/ -perm 644</span><br><span class="line"># 查询 644的文件及目录</span><br></pre></td></tr></table></figure>
+
+<h2 id="Grep"><a href="#Grep" class="headerlink" title="Grep"></a>Grep</h2><blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; Global search regular expression</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">usage: grep [-abcDEFGHhIiJLlmnOoqRSsUVvwxZ] [-A num] [-B num] [-C[num]]</span><br><span class="line">	[-e pattern] [-f file] [--binary-files=value] [--color=when]</span><br><span class="line">	[--context[=num]] [--directories=action] [--label] [--line-buffered]</span><br><span class="line">	[--null] [pattern] [file ...]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>常用参数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">-a 						# 以文本文件方式搜索；</span><br><span class="line">-c 						# 计算找到的符合行的次数；</span><br><span class="line">-i 						# 忽略大小写；</span><br><span class="line">-n 						# 顺便输出行号；</span><br><span class="line">-v 						# 反向选择，即显示不包含匹配文本的所有行；</span><br><span class="line">-h 						# 查询多文件时不显示文件名；</span><br><span class="line">-l 						# 查询多文件时只输出包含匹配字符的文件名；</span><br><span class="line">-s 						# 不显示不存在或无匹配文本的错误信息；</span><br><span class="line">-E 						# 允许使用egrep扩展模式匹配。</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>常用通配符</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">*							# 0个或者多个字符、数字；</span><br><span class="line">?							# 匹配任意一个字符；</span><br><span class="line">#							# 表示注解；</span><br><span class="line">|							# 管道符号；</span><br><span class="line">;							# 多个命令连续执行；</span><br><span class="line">&amp;							# 后台运行指令；</span><br><span class="line">!							# 逻辑运算非；</span><br><span class="line">[]						# 内容范围，匹配括号中内容；</span><br><span class="line">&#123;&#125;						# 命令块，多个命令匹配</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>正则表达式</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">*							# 前一个字符匹配0次或多次</span><br><span class="line">+							# 前面的正则表达式1次或多次</span><br><span class="line">?							# 前面的正则表达式出现0次或多次</span><br><span class="line">^							# 匹配行首，即以某个字符开头；</span><br><span class="line">$							# 匹配行尾，即以某个字符结尾；</span><br><span class="line">\(..\) 				# 标记匹配字符；</span><br><span class="line">[]						# 匹配中括号里的任意指定字符，但只匹配一个字符；</span><br><span class="line">[^]						# 匹配除中括号以外的任意一个字符；</span><br><span class="line">\							# 转义符，取消特殊含义；</span><br><span class="line">\&lt; 						# 锚定单词的开始；</span><br><span class="line">\&gt; 						# 锚定单词的结束；</span><br><span class="line">&#123;n&#125;						# 匹配字符出现n次；</span><br><span class="line">&#123;n,&#125;					# 匹配字符出现大于等于n次；</span><br><span class="line">&#123;n,m&#125;					# 匹配字符至少出现n次，最多出现m次；</span><br><span class="line">\w 						# 匹配文字和数字字符；</span><br><span class="line">\W 						# \w的反置形式，匹配一个或多个非单词字符；</span><br><span class="line">\b 						# 单词锁定符；</span><br><span class="line">\s						# 匹配任何空白字符；</span><br><span class="line">\d						# 匹配一个数字字符，等价于[0-9]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>练一个</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 查询文件ip地址</span><br></pre></td></tr></table></figure>
+
+<h2 id="Awk"><a href="#Awk" class="headerlink" title="Awk"></a>Awk</h2><blockquote>
+<p><code>AWK</code>是一个优良的文本处理工具，<a href="http://baike.baidu.com/item/Linux" target="_blank" rel="noopener">Linux</a>及<a href="http://baike.baidu.com/item/Unix" target="_blank" rel="noopener">Unix</a>环境中现有的功能最强大的数据处理引擎之一</p>
+<p>以<code>Aho</code>、<code>Weinberger</code>、<code>Kernighan</code>三位发明者名字首字母命名为<code>AWK</code>，<code>AWK</code>是一个行级文本高效处理工具</p>
+<p><code>AWK</code>经过改进生成的新的版本有<code>Nawk</code>、<code>Gawk</code>，一般Linux默认为<code>Gawk</code>，<code>Gawk</code>是 <code>AWK</code>的<code>GNU</code>开源免费版本，也就是我们现在所使用的版本</p>
+</blockquote>
+<blockquote>
+<p><code>AWK</code>基本原理是逐行处理文件中的数据，查找与命令行中所给定内容相匹配的模式</p>
+<p>如果发现匹配内容，则进行下一个编程步骤，如果找不到匹配内容，则 继续处理下一行</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">usage: awk [-F fs] [-v var=value] [-f progfile | &apos;prog&apos;] [file ...]</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>内置变量</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">变量</th>
+<th align="left">解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>FS</code></td>
+<td align="left">分隔符</td>
+</tr>
+<tr>
+<td align="left"><code>OFS</code></td>
+<td align="left">输出分隔符</td>
+</tr>
+<tr>
+<td align="left"><code>NR</code></td>
+<td align="left">当前行数，从<code>-1</code>开始</td>
+</tr>
+<tr>
+<td align="left"><code>NF</code></td>
+<td align="left">当前记录字段个数</td>
+</tr>
+<tr>
+<td align="left"><code>$0</code></td>
+<td align="left">当前记录</td>
+</tr>
+<tr>
+<td align="left"><code>$1~$n</code></td>
+<td align="left">当前记录第n个字段（列）</td>
+</tr>
+</tbody></table>
+<ul>
+<li>内置函数</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">函数</th>
+<th align="left">解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>gsub(r, s)</code></td>
+<td align="left">在<code>$0</code>中用<code>s</code>代替<code>r</code></td>
+</tr>
+<tr>
+<td align="left"><code>index(s, t)</code></td>
+<td align="left">返回<code>s</code>中<code>t</code>的第一个位置</td>
+</tr>
+<tr>
+<td align="left"><code>length(s)</code></td>
+<td align="left"><code>s</code>的长度</td>
+</tr>
+<tr>
+<td align="left"><code>match(s, r)</code></td>
+<td align="left"><code>s</code>是否匹配<code>r</code></td>
+</tr>
+<tr>
+<td align="left"><code>split(s, a, fs)</code></td>
+<td align="left">在<code>fs</code></td>
+</tr>
+<tr>
+<td align="left"><code>substr(s, p</code></td>
+<td align="left">返回<code>s</code>从<code>p</code>开始的子串</td>
+</tr>
+</tbody></table>
+<ul>
+<li>操作符</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">操作符</th>
+<th align="left">解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">++、–</td>
+<td align="left">增加或减少</td>
+</tr>
+<tr>
+<td align="left">^、**</td>
+<td align="left">指数</td>
+</tr>
+<tr>
+<td align="left">!、+、-</td>
+<td align="left">非、一元加减</td>
+</tr>
+<tr>
+<td align="left">+、-、*、/、%、</td>
+<td align="left">四则运算、取余</td>
+</tr>
+<tr>
+<td align="left">&lt;&lt;、&lt;=、==、!=、&gt;=、&gt;</td>
+<td align="left">比较大小</td>
+</tr>
+<tr>
+<td align="left">&amp;&amp;、||</td>
+<td align="left">逻辑and、逻辑or</td>
+</tr>
+<tr>
+<td align="left">=、+=、-=、<em>=、/=、%=、^=、*</em>=</td>
+<td align="left">赋值</td>
+</tr>
+</tbody></table>
+<h2 id="Sed"><a href="#Sed" class="headerlink" title="Sed"></a>Sed</h2><blockquote>
+<p>在处理文本时把当前处理的行存储在临时缓冲区中，称为：模式空间，<strong>pattern space</strong></p>
+<p>然后SED命令处理缓冲区中的内容，处理完成后将缓冲区的内容输出至屏幕或者写入文件</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">x                   				# x为指定行号；</span><br><span class="line">x,y                 		    # 指定从x到y的行号范围；</span><br><span class="line">/pattern/           		    # 查询包含模式的行；</span><br><span class="line">/pattern/pattern/   		    # 查询包含两个模式的行；</span><br><span class="line">/pattern/,x         		    # 从与pattern的匹配行到x号行之间的行；</span><br><span class="line">x,/pattern/         		    # 从x号行到与pattern的匹配行之间的行；</span><br><span class="line">x,y!                		    # 查询不包括x和y行号的行；</span><br><span class="line">r                						# 从另一个文件中读文件；</span><br><span class="line">w                						# 将文本写入到一个文件；</span><br><span class="line">y                						# 变换字符；</span><br><span class="line">q             							# 第一个模式匹配完成后退出；</span><br><span class="line">l                						# 显示与八进制ASCII码等价的控制字符；</span><br><span class="line">&#123;&#125;              			    	# 在定位行执行的命令组；</span><br><span class="line">p                						# 打印匹配行；</span><br><span class="line">=                						# 打印文件行号；</span><br><span class="line">a\              			    	# 在定位行号之后追加文本信息；</span><br><span class="line">i\              			    	# 在定位行号之前插入文本信息；</span><br><span class="line">d                						# 删除定位行；</span><br><span class="line">c\              			    	# 用新文本替换定位文本；</span><br><span class="line">s                						# 使用替换模式替换相应模式；</span><br><span class="line">n                						# 读取下一个输入行，用下一个命令处理新的行；</span><br><span class="line">N                           # 将当前读入行的下一行读取到当前的模式空间。</span><br><span class="line">h                						# 将模式缓冲区的文本复制到保持缓冲区；</span><br><span class="line">H                						# 将模式缓冲区的文本追加到保持缓冲区；</span><br><span class="line">x                						# 互换模式缓冲区和保持缓冲区的内容；</span><br><span class="line">g                						# 将保持缓冲区的内容复制到模式缓冲区；</span><br><span class="line">G                						# 将保持缓冲区的内容追加到模式缓冲区。</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>sed</strong>工具默认处理文本，文本内容输出屏幕已经修改，但是文件内容其实没有修改</p>
+<p>需要加<strong>-i</strong>参数即对文件彻底修改；</p>
+</blockquote>
+<ul>
+<li>查看文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cat -n file | sed -n &quot;p&quot;</span><br><span class="line"># 查看file文件 并且阅读其中所有行，因p前无规则</span><br><span class="line">cat -n file | sed -n &quot;1,3p&quot;</span><br><span class="line"># 查看file文件 1-3行</span><br><span class="line">sed &quot;1p;\$p&quot; file</span><br><span class="line">sed &apos;1p;$p&apos; file</span><br><span class="line"># 查看文件第一行和最后一行</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>删除文件内容</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sed &apos;1,3d&apos; file</span><br><span class="line"># 删除文件第一到第三行</span><br><span class="line">sed &apos;$d&apos; file</span><br><span class="line"># 删除文件最后一行</span><br><span class="line">sed -i &apos;/#*/d&apos; file</span><br><span class="line"># 删除文件中以#号开头的行</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>替换文本内容</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sed &apos;s/old/new/g&apos; file</span><br><span class="line">sed -i &apos;s/old/new/g&apos; file # 加了-i那么修改会影响到原本的文件对象</span><br><span class="line"># 替换file文件中的old内容为new</span><br><span class="line">#	s:使用替换模式替换相应模式</span><br><span class="line"># g:将保持缓冲区的内容复制到模式缓冲区；</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>追加文本内容</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sed &quot;/###/a 123123123&quot; file</span><br><span class="line"># 在file的符合###匹配的 后面加一行123123123</span><br><span class="line">sed &quot;1,3a 123123123&quot; file</span><br><span class="line"># 在文件的1，3行追加123123123</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>插入文本内容</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sed &quot;/###/a 123123123&quot; file</span><br><span class="line"># 在file的符合###匹配的 前面加一行123123123</span><br><span class="line">sed &quot;1,3a 123123123&quot; file</span><br><span class="line"># 在文件的1，3行前面加123123123</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xiao Zhuang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaozhuang.tech/2018/08/08/Linux四剑客/" title="Linux四剑客">http://xiaozhuang.tech/2018/08/08/Linux四剑客/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <div>
+        
+          <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+        
+      </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2017/09/15/javascript/" rel="next" title="Javascript">
+                  <i class="fa fa-chevron-left"></i> Javascript
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2018/08/11/Redis哨兵机制/" rel="prev" title="Redis哨兵机制">
+                  Redis哨兵机制 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Find"><span class="nav-text">Find</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Grep"><span class="nav-text">Grep</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Awk"><span class="nav-text">Awk</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sed"><span class="nav-text">Sed</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Xiao Zhuang"
+    src="/images/cao.jpg">
+  <p class="site-author-name" itemprop="name">Xiao Zhuang</p>
+  <div class="site-description" itemprop="description">小试牛刀</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" title="GitHub &rarr; https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1624611910@qq.com" title="E-Mail &rarr; mailto:1624611910@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://cy-blogs.cn" title="https://cy-blogs.cn" rel="noopener" target="_blank">laochen</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://v3u.cn/" title="https://v3u.cn/" rel="noopener" target="_blank">悦哥</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘国壮</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,0' opacity='0.5' zIndex='-1' count='150' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.2"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>
