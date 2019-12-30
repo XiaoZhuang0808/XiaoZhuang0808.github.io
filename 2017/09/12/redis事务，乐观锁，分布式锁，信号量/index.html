@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.2">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.2" color="#222">
+  <link rel="alternate" href="/atom.xml" title="LGZ BLOG" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.2">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.2',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+
+  <meta name="description" content="Redis简介 Redis是一款内存高速缓存数据库，该软件使用C语言编写， Redis是一个key - value 存储系统，它支持丰富的数据类型， 如：String、List、Set、Hash。 是为了解决高并发、高扩展，大数据存储等问题！">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis 事务、乐观锁、分布式锁、信号量">
+<meta property="og:url" content="http://xiaozhuang.tech/2017/09/12/redis事务，乐观锁，分布式锁，信号量/index.html">
+<meta property="og:site_name" content="LGZ BLOG">
+<meta property="og:description" content="Redis简介 Redis是一款内存高速缓存数据库，该软件使用C语言编写， Redis是一个key - value 存储系统，它支持丰富的数据类型， 如：String、List、Set、Hash。 是为了解决高并发、高扩展，大数据存储等问题！">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-26T12:16:13.958Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Redis 事务、乐观锁、分布式锁、信号量">
+<meta name="twitter:description" content="Redis简介 Redis是一款内存高速缓存数据库，该软件使用C语言编写， Redis是一个key - value 存储系统，它支持丰富的数据类型， 如：String、List、Set、Hash。 是为了解决高并发、高扩展，大数据存储等问题！">
+
+<link rel="canonical" href="http://xiaozhuang.tech/2017/09/12/redis事务，乐观锁，分布式锁，信号量/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Redis 事务、乐观锁、分布式锁、信号量 | LGZ BLOG</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">LGZ BLOG</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Action is the proper fruit of knowledge</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://xiaozhuang.tech/2017/09/12/redis事务，乐观锁，分布式锁，信号量/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cao.jpg">
+      <meta itemprop="name" content="Xiao Zhuang">
+      <meta itemprop="description" content="小试牛刀">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="LGZ BLOG">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis 事务、乐观锁、分布式锁、信号量
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-09-12 12:34:00" itemprop="dateCreated datePublished" datetime="2017-09-12T12:34:00+08:00">2017-09-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Redis/" itemprop="url" rel="index">
+                    <span itemprop="name">Redis</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Redis简介"><a href="#Redis简介" class="headerlink" title="Redis简介"></a>Redis简介</h1><blockquote>
+<p>Redis是一款内存高速缓存数据库，该软件使用C语言编写，</p>
+<p>Redis是一个key - value 存储系统，它支持丰富的数据类型，</p>
+<p>如：String、List、Set、Hash。</p>
+<p>是为了解决高并发、高扩展，大数据存储等问题！</p>
+</blockquote><a id="more"></a>
+<ul>
+<li>读写效率高，持久化、丰富的特性</li>
+</ul>
+<blockquote>
+<p>读写效率高：读写速度最高可达 <code>10万次/s+</code>。</p>
+<p>持久化：断电或重启后，数据也不会丢失。因为 Redis 的存储分为内存存储、磁盘存储和 log 文件三部分，中启后，Redis可以从磁盘将数据加载到内存中。</p>
+<p>丰富的特性：建空间、事务、订阅发布功能、计数。</p>
+</blockquote>
+<h2 id="Redis-事务"><a href="#Redis-事务" class="headerlink" title="Redis 事务"></a>Redis 事务</h2><ul>
+<li><p>回顾Mysql 数据库事务</p>
+<ul>
+<li>什么是事务，事务是原子操作，里面的操作，要么都成功，要么都不成功。</li>
+</ul>
+</li>
+<li><p>原子性</p>
+<ul>
+<li>整个事务的操作，要么都成功，要么都不成功，如果在执行的过程中，发生了错误，就回滚到开始的状态。</li>
+</ul>
+</li>
+<li><p>一致性</p>
+<ul>
+<li>在事务的开始前，和结束后，数据的完整性约束，没有被破坏。</li>
+</ul>
+</li>
+<li><p>隔离性</p>
+<ul>
+<li>使得同一时间，只有一个请求同一数据。</li>
+</ul>
+</li>
+<li><p>持久性</p>
+<ul>
+<li>事务成功之后，对数据库的操作会，永远的保存在数据库当中。</li>
+</ul>
+</li>
+<li><p><strong>Redsi</strong>事务</p>
+<blockquote>
+<p>Redis 事务的本质：</p>
+<p>​        是将一组操作放入队列中，批量执行，过程中如果产生了某个命令错误，不会回滚，其他正确的命令，仍然会继续执行</p>
+</blockquote>
+</li>
+<li><p>与 mysql 对比</p>
+<ul>
+<li><p>redis 是  ：</p>
+<p>​    开始事务   multi（）</p>
+<p>​    提交事务  execute（）</p>
+<p>​    放弃事务  reset（）</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="什么时候用到锁"><a href="#什么时候用到锁" class="headerlink" title="什么时候用到锁"></a>什么时候用到锁</h3><ul>
+<li>锁的生命周期<ul>
+<li>任务通过竞争获取锁才能对资源进行操作 （竞争锁）</li>
+<li>当任务在对资源进行操作时！（占有锁）</li>
+<li>其它任务都不可以对这个资源操作 （任务阻塞）</li>
+<li>直到该任务完成更新 （释放锁）</li>
+</ul>
+</li>
+</ul>
+<h3 id="redis-乐观锁的使用"><a href="#redis-乐观锁的使用" class="headerlink" title="redis 乐观锁的使用"></a>redis 乐观锁的使用</h3><ul>
+<li><p>乐观锁：</p>
+<blockquote>
+<p>每次去拿数据的时候都认为别人不会修改，所以不会上锁，但是在更新的时候会判断一下在此期间别人有没有去跟新这个数据</p>
+</blockquote>
+</li>
+<li><p>redis 中的乐观锁：</p>
+<blockquote>
+<p>可以使用 watch（）方法来实现，可以监控一个或多个键，再事务执行的过程中，其中的一个键发生了改变，那么这个事务，就不会执行。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="redis-实现分布式锁"><a href="#redis-实现分布式锁" class="headerlink" title="redis 实现分布式锁"></a>redis 实现分布式锁</h3><ul>
+<li><p>什么是分布式锁：</p>
+<blockquote>
+<p>控制分布式系统有序的去对共享资源进行操作，通过互斥来保持一致性。</p>
+</blockquote>
+<p><a href="https://v.qq.com/x/page/n3026r8xhil.html" target="_blank" rel="noopener">https://v.qq.com/x/page/n3026r8xhil.html</a></p>
+</li>
+<li><p>SETNX（）</p>
+<blockquote>
+<p>这个命令会在键不存在的情况下为键设置值，如果存在的情况下则不作任何操作！</p>
+<p>setnx 是『SET if Not eXists』(如果不存在，则 SET)的简写。 <strong>命令格式</strong>：SETNX key value；使用：只在键 key 不存在的情况下，将键 key 的值设置为 value 。</p>
+</blockquote>
+</li>
+<li><p>获取锁</p>
+<blockquote>
+<p>如果程序在尝试获取锁的过程中失败，那么他将不断的进行重试，直到成功的取到锁，或者超过锁的过期时间</p>
+</blockquote>
+</li>
+<li><p>删除锁</p>
+<blockquote>
+<p>删除锁之前会先判断，是否是该线程加的锁，如果是，则执行delete 进行删除。</p>
+</blockquote>
+</li>
+</ul>
+<p>####redis分布式原理一：</p>
+<p><strong>过程分析：</strong></p>
+<ul>
+<li>A尝试去获取锁lockkey，通过setnx(lockkey,currenttime+timeout)命令，对lockkey进行setnx,将value值设置为当前时间+锁超时时间；</li>
+<li>如果返回值为1，说明redis服务器中还没有lockkey，也就是没有其他用户拥有这个锁，A就能获取锁成功；</li>
+<li>在进行相关业务执行之前，先执行expire(lockkey)，对lockkey设置有效期，防止死锁。因为如果不设置有效期的话，lockkey将一直存在于redis中，其他用户尝试获取锁时，执行setnx(lockkey,currenttime+timeout)时，将不能成功获取到该锁；</li>
+<li>执行相关业务；</li>
+<li>释放锁，A完成相关业务之后，要释放拥有的锁，也就是删除redis中该锁的内容，del(lockkey)，接下来的用户才能进行重新设置锁新值。</li>
+</ul>
+<p>####redis分布式原理二：（解决死锁问题）</p>
+<ul>
+<li>当A通过setnx(lockkey,currenttime+timeout)命令能成功设置lockkey时，即返回值为1，过程与原理1一致；</li>
+<li>当A通过setnx(lockkey,currenttime+timeout)命令不能成功设置lockkey时，这是不能直接断定获取锁失败；</li>
+<li>因为我们在设置锁时，设置了锁的超时时间timeout，当当前时间大于redis中存储键值为lockkey的value值时，可以认为上一任的拥有者对锁的使用权已经失效了，A就可以强行拥有该锁；具体判定过程如下；</li>
+<li>A通过get(lockkey)，获取redis中的存储键值为lockkey的value值，即获取锁的相对时间lockvalueA<br>lockvalueA!=null &amp;&amp; currenttime&gt;lockvalue，A通过当前的时间与锁设置的时间做比较，如果当前时间已经大于锁设置的时间临界，即可以进一步判断是否可以获取锁，否则说明该锁还在被占用，A就还不能获取该锁，结束，获取锁失败；</li>
+<li>步骤4返回结果为true后，通过getSet设置新的超时时间，并返回旧值lockvalueB，以作判断，因为在分布式环境，在进入这里时可能另外的进程获取到锁并对值进行了修改，只有旧值与返回的值一致才能说明中间未被其他进程获取到这个锁；</li>
+<li>lockvalueB == null || lockvalueA==lockvalueB，判断：若果lockvalueB为null，说明该锁已经被释放了，此时该进程可以获取锁；旧值与返回的lockvalueB一致说明中间未被其他进程获取该锁，可以获取锁；否则不能获取锁，结束，获取锁失败。</li>
+</ul>
+<h3 id="分布式锁应该具备哪些条件"><a href="#分布式锁应该具备哪些条件" class="headerlink" title="分布式锁应该具备哪些条件"></a>分布式锁应该具备哪些条件</h3><ul>
+<li>互斥性，在任意时刻，只有一个客户端能持有锁</li>
+<li>高可用的获取锁和释放锁</li>
+<li>具备锁失效机制，避免死锁</li>
+<li>具备非阻塞锁特性，即没有获取到锁直接返回获取锁失败</li>
+<li>释放锁</li>
+</ul>
+<p>###分布式锁和线程锁的区别：</p>
+<ul>
+<li>保证资源独立</li>
+<li>弱化一致性</li>
+<li>提升效率和可用性</li>
+<li>保障资源最终一致性</li>
+</ul>
+<h3 id="计数信号量"><a href="#计数信号量" class="headerlink" title="计数信号量"></a>计数信号量</h3><blockquote>
+<p>何为计数信号量？<br>简单来说就是控制对共享资源的访问。<br>实现方法： Semaphore （）<br>Semaphore 是一个计数信号量。<br>常用于限制可以访问某些资源的线程数量</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xiao Zhuang
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://xiaozhuang.tech/2017/09/12/redis事务，乐观锁，分布式锁，信号量/" title="Redis 事务、乐观锁、分布式锁、信号量">http://xiaozhuang.tech/2017/09/12/redis事务，乐观锁，分布式锁，信号量/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <div>
+        
+          <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+        
+      </div>
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+                <a href="/2017/08/06/时间模块/" rel="next" title="时间模块">
+                  <i class="fa fa-chevron-left"></i> 时间模块
+                </a>
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+                <a href="/2017/09/15/javascript/" rel="prev" title="Javascript">
+                  Javascript <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis简介"><span class="nav-text">Redis简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-事务"><span class="nav-text">Redis 事务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么时候用到锁"><span class="nav-text">什么时候用到锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redis-乐观锁的使用"><span class="nav-text">redis 乐观锁的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redis-实现分布式锁"><span class="nav-text">redis 实现分布式锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式锁应该具备哪些条件"><span class="nav-text">分布式锁应该具备哪些条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#计数信号量"><span class="nav-text">计数信号量</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <img class="site-author-image" itemprop="image" alt="Xiao Zhuang"
+    src="/images/cao.jpg">
+  <p class="site-author-name" itemprop="name">Xiao Zhuang</p>
+  <div class="site-description" itemprop="description">小试牛刀</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" title="GitHub &rarr; https://github.com/XiaoZhuang0808/XiaoZhuang0808.github.io" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1624611910@qq.com" title="E-Mail &rarr; mailto:1624611910@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/null" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+  <div class="links-of-blogroll motion-element">
+    <div class="links-of-blogroll-title">
+      <i class="fa fa-fw fa-link"></i>
+      Links
+    </div>
+    <ul class="links-of-blogroll-list">
+        <li class="links-of-blogroll-item">
+          <a href="https://cy-blogs.cn" title="https://cy-blogs.cn" rel="noopener" target="_blank">laochen</a>
+        </li>
+        <li class="links-of-blogroll-item">
+          <a href="https://v3u.cn/" title="https://v3u.cn/" rel="noopener" target="_blank">悦哥</a>
+        </li>
+    </ul>
+  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘国壮</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='0,0,0' opacity='0.5' zIndex='-1' count='150' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.2"></script><script src="/js/motion.js?v=7.4.2"></script>
+<script src="/js/schemes/pisces.js?v=7.4.2"></script>
+<script src="/js/next-boot.js?v=7.4.2"></script>
+
+
+
+  
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.2"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
+
+<!-- 页面点击小红心 -->
+<script type="text/javascript" src="/js/src/clicklove.js"></script>

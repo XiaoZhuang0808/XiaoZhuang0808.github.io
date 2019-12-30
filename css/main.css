@@ -155,7 +155,7 @@ body {
   height: 100%;
 }
 body {
-  background: url("/images/15.jfif");
+  background: url("/images/18.jfif");
   color: #555;
   font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;
   font-size: 0.9em;
@@ -311,9 +311,9 @@ td {
   transition-timing-function: ease-in-out;
 }
 .btn:hover {
-  background: #222;
-  border-color: #222;
-  color: #fff;
+  background: url("/images/14.jfif");
+  border-color: #a79c83;
+  color: #000;
 }
 .btn + .btn {
   margin: 0 0 8px 8px;
@@ -1188,7 +1188,7 @@ pre .javascript .function {
 }
 .links-of-author a::before,
 .links-of-author span.exturl::before {
-  background: #e70a66;
+  background: #a36f1c;
   border-radius: 50%;
   content: ' ';
   display: inline-block;
@@ -2400,7 +2400,7 @@ ul.breadcrumb li + li:last-child {
   position: relative;
 }
 .site-meta {
-  background: #222;
+  background: url("/images/14.jfif");
   color: #fff;
   padding: 20px 0;
 }
