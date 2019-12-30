@@ -400,6 +400,196 @@
       </tags>
   </entry>
   <entry>
+    <title>Redis 发布者与订阅者,键空间事件</title>
+    <url>/2018/10/16/Redis%E5%8F%91%E5%B8%83%E8%80%85%E4%B8%8E%E8%AE%A2%E9%98%85%E8%80%85%EF%BC%8C%E9%94%AE%E7%A9%BA%E9%97%B4%E4%BA%8B%E4%BB%B6/</url>
+    <content><![CDATA[<h2 id="发布者与订阅者（pub-sub）"><a href="#发布者与订阅者（pub-sub）" class="headerlink" title="发布者与订阅者（pub/sub）"></a>发布者与订阅者（pub/sub）</h2><p>发布和订阅<code>pub/sub</code>，订阅者负责订阅频道，发送者负责像频道发送二进制字符串消息，每当有消息发布到订阅的这个频道，那么所有的订阅者都可以收到这个消息，发布订阅也是像是我们生活中的电台，订阅者可以订阅收听多个电台，而发送者可以再任何电台发送消息</p><a id="more"></a>
+<h3 id="发布，订阅常用命令"><a href="#发布，订阅常用命令" class="headerlink" title="发布，订阅常用命令"></a>发布，订阅常用命令</h3><table>
+<thead>
+<tr>
+<th>指令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SUBSCRIBE CHANNLE</td>
+<td>订阅给定的一个或多个频道</td>
+</tr>
+<tr>
+<td>UNSUBSCRIBE CHANNLE</td>
+<td>退订一个或多个频道，如果没有指定具体退订的频道，那么是全部退订</td>
+</tr>
+<tr>
+<td>PSUBSCRIBE PATTERN</td>
+<td>订阅与给定模式相匹配的所有频道</td>
+</tr>
+<tr>
+<td>PUNSUBSCRIBE PATTERN</td>
+<td>退订给定的模式相匹配的频道，未指定，则退订所有</td>
+</tr>
+<tr>
+<td>PUBLISH CHANNLE MESSAGE</td>
+<td>向给定频道发送消息</td>
+</tr>
+</tbody></table>
+<h2 id="键空间事件"><a href="#键空间事件" class="headerlink" title="键空间事件"></a>键空间事件</h2><h3 id="键空间事件通知"><a href="#键空间事件通知" class="headerlink" title="键空间事件通知"></a>键空间事件通知</h3><p>在<code>Redis</code>里面有一些事件，比如键<strong>到期</strong>、键被<strong>删除</strong>等。可以通过打开<code>redis</code>键空间事件通知来让 Redis 一旦触发这些事件的时候就往特定的<code>Channel</code>推一条消息</p>
+<h3 id="键事件通知配置"><a href="#键事件通知配置" class="headerlink" title="键事件通知配置"></a>键事件通知配置</h3><ul>
+<li>默认在<code>redis</code>中，键事件通知是不打开的，需要我们手动配置，具体的选项如下，默认他是个空字符串，代表关闭状态</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">notify-keyspace-events &quot;&quot;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>选项字符</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>K</td>
+<td>键空间通知，所有通知以<code>__keyspace@&lt;db&gt;__</code> 为前缀</td>
+</tr>
+<tr>
+<td>E</td>
+<td>键事件通知，所有通知以<code>__keyevent@&lt;db&gt;__</code> 为前缀</td>
+</tr>
+<tr>
+<td>g</td>
+<td><code>DEL</code>、<code>EXPIRE</code>、<code>RENAME</code>等类型无关的通用命令的通知</td>
+</tr>
+<tr>
+<td>$</td>
+<td>字符串命令的通知</td>
+</tr>
+<tr>
+<td>l</td>
+<td>列表命令的通知</td>
+</tr>
+<tr>
+<td>s</td>
+<td>集合命令的通知</td>
+</tr>
+<tr>
+<td>h</td>
+<td>哈希命令的通知</td>
+</tr>
+<tr>
+<td>z</td>
+<td>有序集合命令的通知</td>
+</tr>
+<tr>
+<td>x</td>
+<td>过期事件：每当有过期键被删除时发送</td>
+</tr>
+<tr>
+<td>e</td>
+<td>驱逐<code>(evict)</code>事件：每当有键因为<code>maxmemory</code>政策而被删除时发送</td>
+</tr>
+<tr>
+<td>A</td>
+<td>参数<code>g$lshzxe</code>的别名</td>
+</tr>
+</tbody></table>
+<p>注意，该选项的值中至少需要包含K或者E，否则不会发布任何事件。比如，如果需要开启针对列表的keyspace事件通知，则该选项需要配置为“Kl”； </p>
+<h3 id="键空间和键事件"><a href="#键空间和键事件" class="headerlink" title="键空间和键事件"></a>键空间和键事件</h3><blockquote>
+<p>对于每个修改数据库的操作，键空间通知都会发送两种不同类型的事件</p>
+<p>比如说，对<code>0</code>号数据库的键<code>mykey</code>执行<code>DEL</code>命令时， 系统将分发两条消息， 相当于执行以下两个<code>PUBLISH</code>命令</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PUBLISH __keyspace@0__:mykey del</span><br><span class="line">PUBLISH __keyevent@0__:del mykey</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>__keyspace@0__:mykey</code>：接收<code>0</code>号数据库中所有修改键<code>mykey</code>的事件</li>
+<li><code>__keyevent@0__:del</code>：接收<code>0</code>号数据库中所有执行<code>del</code>命令的键</li>
+</ul>
+<blockquote>
+<p><code>keyspace</code>为前缀的频道被称为键空间通知<code>key-space notification</code></p>
+</blockquote>
+<blockquote>
+<p><code>keyevent</code>为前缀的频道则被称为键事件通知<code>key-event notification</code></p>
+</blockquote>
+<ul>
+<li>订阅<strong>键空间频道</strong>，监控被执行事件的键，如监控<code>mykey</code>；那么此时将接收到该键所对应的事件：<code>del</code></li>
+<li>订阅<strong>键事件频道</strong>，监控某个事件，如<code>del</code>；那么<code>del</code>事件触发时，订阅者收到：<code>mykey</code></li>
+</ul>
+<h3 id="过期的键事件通知"><a href="#过期的键事件通知" class="headerlink" title="过期的键事件通知"></a>过期的键事件通知</h3><ul>
+<li>过期的键事件通知常用在订单过期通知等场景下，此时只需要订阅对应<strong>过期事件</strong>的频道，当某键触发过期事件时，即可接受到对应<strong>过期键</strong>的消息</li>
+<li><code>redis</code>配置如下：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">notify-keyspace-events &quot;Ex&quot;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>Python</code>代码的简单示范，订阅过期频道</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import redis</span><br><span class="line">import time</span><br><span class="line">redis = redis.Redis(host=&apos;123.57.61.168&apos;, port=6379)</span><br><span class="line">pubsub = redis.pubsub()</span><br><span class="line">pubsub.psubscribe(&apos;__keyevent@0__:expired&apos;) # 订阅过期事件频道</span><br><span class="line">print(&apos;Starting message loop&apos;)</span><br><span class="line">while True:</span><br><span class="line">    try:</span><br><span class="line">        message = pubsub.get_message()</span><br><span class="line">        if message:</span><br><span class="line">            print(message)</span><br><span class="line">        else:</span><br><span class="line">            time.sleep(0.01)</span><br><span class="line">    except KeyboardInterrupt:</span><br><span class="line">        # CTRL + C</span><br><span class="line">        break</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>那么当此时执行此段代码，另起<code>redis</code>客户端，设置一个可以过期的<code>key</code>值，来看一下效果</li>
+</ul>
+<p><img src="/2018/10/16/Redis发布者与订阅者，键空间事件/%E9%94%AE%E8%BF%87%E6%9C%9F%E4%BA%8B%E4%BB%B6%E9%80%9A%E7%9F%A5.gif" alt="键过期事件通知"></p>
+<h3 id="不同命令产生的事件通知"><a href="#不同命令产生的事件通知" class="headerlink" title="不同命令产生的事件通知"></a>不同命令产生的事件通知</h3><ul>
+<li>DEL 命令为每个被删除的键产生一个 del 事件；</li>
+<li>RENAME 产生两个事件：为源键产生一个 rename_from 事件，并为目标键产生一个 rename_to 事件；</li>
+<li>EXPIRE命令，在设置键的过期时间时产生一个 expire事件；当键因过期而被删除时，产生一个 expired事件；</li>
+<li>SORT命令，在带有 STORE 参数时产生一个 sortstore事件。如果 STORE 指示的用于保存排序结果的键已经存在，则原键会被删除，因此还会产生一个 del 事件；</li>
+<li>SET 以及它的所有变种(SETEX、SETNX和GETSET)都产生set事件。另外，SETEX命令还会产生expire 事件；</li>
+<li>MSET 命令，为每个键产生一个 set 事件；</li>
+<li>SETRANGE 产生一个 setrange 事件；</li>
+<li>INCR 、DECR、INCRBY和DECRBY都产生 incrby 事件；</li>
+<li>INCRBYFLOAT产生incrbyfloat事件；</li>
+<li>APPEND产生append事件；</li>
+<li>LPUSH和LPUSHX都产生单个 lpush 事件，即使有多个输入元素时，也是如此；</li>
+<li>RPUSH 和 RPUSHX 都产生单个rpush事件，即使有多个输入元素时，也是如此；</li>
+<li>RPOP 产生 rpop 事件，如果被弹出的元素是列表的最后一个元素，那么还会产生一个 del 事件；</li>
+<li>LPOP 产生 lpop 事件，如果被弹出的元素是列表的最后一个元素，那么还会产生一个 del 事件；</li>
+<li>LINSERT 产生一个 linsert 事件；</li>
+<li>LSET 产生一个 lset 事件；</li>
+<li>LREM产生一个lrem事件，如果该命令执行之后，列表键被清空，则还会产生一个 del 事件；</li>
+<li>LTRIM 产生一个ltrim事件，如果该命令执行之后，列表键被清空，则还会产生一个 del 事件；</li>
+<li>RPOPLPUSH 和 BRPOPLPUSH 产生一个 rpop 事件，以及一个 lpush 事件。两个命令都保证rpop事件在 lpush 事件之前发出。如果弹出元素之后，列表键被清空，则还会产生一个 del 事件；</li>
+<li>HSET 、 HSETNX 和 HMSET 都只产生一个 hset 事件；</li>
+<li>HINCRBY 产生一个 hincrby 事件；</li>
+<li>HINCRBYFLOAT 产生一个 hincrbyfloat 事件；</li>
+<li>HDEL 产生一个 hdel 通知。如果执行该命令之后，哈希键被清空，则还会产生一个del事件；</li>
+<li>SADD 产生一个 sadd 事件，即使有多个输入元素时，也是如此；</li>
+<li>SREM 产生一个 srem 事件，如果执行该命令之后，集合键被清空，则还会产生一个 del 事件；</li>
+<li>SMOVE 为源键产生一个 srem 事件，并为目标键产生一个sadd 事件；</li>
+<li>SPOP 产生一个 spop 事件。如果执行该命令之后，集合键被清空，则还会产生一个 del 事件；</li>
+<li>SINTERSTORE、SUNIONSTORE和SDIFFSTORE分别产生 sinterstore、sunionostore和sdiffstore 三种事件。如果用于保存结果的键已经存在，则还会产生一个 del 事件；</li>
+<li>ZINCR产生一个 zincr 事件；</li>
+<li>ZADD 产生一个 zadd事件，即使有多个输入元素时，也是如此；</li>
+<li>ZREM 产生一个 zrem 通知，即使有多个输入元素时，也是如此。如果执行 ZREM 之后，有序集合键被清空，则还会产生一个 del 事件；</li>
+<li>ZREMEBYSCORE 产生一个 zrembyscore事件，如果用于保存结果的键已经存在，则还会产生一个 del 事件。</li>
+<li>ZREMBYRANK 产生一个 zrembyrank事件，如果用于保存结果的键已经存在，则还会产生一个 del 事件。</li>
+<li>ZINTERSTORE 和 ZUNIONSTORE 分别产生 zinterstore 和 zunionstore 两种事件。如果用于保存结果的键已经存在，那么还会产生一个 del 事件。</li>
+<li>每当一个键因为过期而被删除时，产生一个 expired 事件。</li>
+<li>每当一个键因为 maxmemory策略而被删除并回收内存时，产生一个 evicted 事件。</li>
+</ul>
+<p>注意：所有命令都只在键真的被改动了之后，才会产生事件通知。比如，当srem命令试图删除不存在于集合的元素时，删除操作执行失败，因为没有真正的改动键，所以这一操作不会发送通知。</p>
+<h3 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h3><p><strong>1：Redis发布所有通知，客户端A订阅所有消息：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config set notify-keyspace-events KEA</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; psubscribe key*@0:*</span><br><span class="line">Reading messages... (press Ctrl-C to quit)</span><br><span class="line">1) &quot;psubscribe&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) (integer) 1</span><br></pre></td></tr></table></figure>
+
+<p>然后，在客户端B上执行set和del命令：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set msg &quot;hello&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; del msg</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; del msg</span><br><span class="line">(integer) 0</span><br></pre></td></tr></table></figure>
+
+<p>然后客户端A的打印如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;set&quot;</span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;__key@0:*&quot;</span><br><span class="line">3) &quot;keyevent@0__:set&quot;</span><br><span class="line">4) &quot;msg&quot;</span><br><span class="line"></span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;del&quot;</span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;__key@0:*&quot;</span><br><span class="line">3) &quot;keyevent@0__:del&quot;</span><br><span class="line">4) &quot;msg&quot;</span><br></pre></td></tr></table></figure>
+
+<p> 可见，针对每一个操作，客户端A都收到了两种消息，分别是keyspace和keyevent消息。</p>
+<p><strong>2：使Redis仅发布keyspace通知，而客户端A订阅所有消息类型：</strong></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config set notify-keyspace-events KA</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; psubscribe key*@0:*</span><br><span class="line">Reading messages... (press Ctrl-C to quit)</span><br><span class="line">1) &quot;psubscribe&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) (integer) 1</span><br></pre></td></tr></table></figure>
+
+<p>在客户端B上执行，与上面同样的步骤。此时，客户端A上的打印：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;set&quot;</span><br><span class="line"></span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;del&quot;</span><br></pre></td></tr></table></figure>
+
+<p>可见，尽管客户端A订阅了所有消息，但是Redis仅发布了keyspace事件。而且，在客户端B上执行了两次del操作，而只有第一个del成功执行了，从而产生了一个事件。</p>
+]]></content>
+      <categories>
+        <category>Redis</category>
+      </categories>
+      <tags>
+        <tag>Redis 发布者与订阅者,键空间事件</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HayStack全文检索在Django中的应用</title>
     <url>/2018/10/16/HayStack%E5%85%A8%E6%96%87%E6%A3%80%E7%B4%A2%E5%9C%A8Django%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/</url>
     <content><![CDATA[<h2 id="全文检索"><a href="#全文检索" class="headerlink" title="全文检索"></a>全文检索</h2><p><a href="https://django-haystack.readthedocs.io/en/v2.4.1/tutorial.html" target="_blank" rel="noopener">官方文档</a></p>
@@ -595,196 +785,6 @@
       </categories>
       <tags>
         <tag>Django</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Redis 发布者与订阅者,键空间事件</title>
-    <url>/2018/10/16/Redis%E5%8F%91%E5%B8%83%E8%80%85%E4%B8%8E%E8%AE%A2%E9%98%85%E8%80%85%EF%BC%8C%E9%94%AE%E7%A9%BA%E9%97%B4%E4%BA%8B%E4%BB%B6/</url>
-    <content><![CDATA[<h2 id="发布者与订阅者（pub-sub）"><a href="#发布者与订阅者（pub-sub）" class="headerlink" title="发布者与订阅者（pub/sub）"></a>发布者与订阅者（pub/sub）</h2><p>发布和订阅<code>pub/sub</code>，订阅者负责订阅频道，发送者负责像频道发送二进制字符串消息，每当有消息发布到订阅的这个频道，那么所有的订阅者都可以收到这个消息，发布订阅也是像是我们生活中的电台，订阅者可以订阅收听多个电台，而发送者可以再任何电台发送消息</p><a id="more"></a>
-<h3 id="发布，订阅常用命令"><a href="#发布，订阅常用命令" class="headerlink" title="发布，订阅常用命令"></a>发布，订阅常用命令</h3><table>
-<thead>
-<tr>
-<th>指令</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>SUBSCRIBE CHANNLE</td>
-<td>订阅给定的一个或多个频道</td>
-</tr>
-<tr>
-<td>UNSUBSCRIBE CHANNLE</td>
-<td>退订一个或多个频道，如果没有指定具体退订的频道，那么是全部退订</td>
-</tr>
-<tr>
-<td>PSUBSCRIBE PATTERN</td>
-<td>订阅与给定模式相匹配的所有频道</td>
-</tr>
-<tr>
-<td>PUNSUBSCRIBE PATTERN</td>
-<td>退订给定的模式相匹配的频道，未指定，则退订所有</td>
-</tr>
-<tr>
-<td>PUBLISH CHANNLE MESSAGE</td>
-<td>向给定频道发送消息</td>
-</tr>
-</tbody></table>
-<h2 id="键空间事件"><a href="#键空间事件" class="headerlink" title="键空间事件"></a>键空间事件</h2><h3 id="键空间事件通知"><a href="#键空间事件通知" class="headerlink" title="键空间事件通知"></a>键空间事件通知</h3><p>在<code>Redis</code>里面有一些事件，比如键<strong>到期</strong>、键被<strong>删除</strong>等。可以通过打开<code>redis</code>键空间事件通知来让 Redis 一旦触发这些事件的时候就往特定的<code>Channel</code>推一条消息</p>
-<h3 id="键事件通知配置"><a href="#键事件通知配置" class="headerlink" title="键事件通知配置"></a>键事件通知配置</h3><ul>
-<li>默认在<code>redis</code>中，键事件通知是不打开的，需要我们手动配置，具体的选项如下，默认他是个空字符串，代表关闭状态</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">notify-keyspace-events &quot;&quot;</span><br></pre></td></tr></table></figure>
-
-<table>
-<thead>
-<tr>
-<th>选项字符</th>
-<th>解释</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>K</td>
-<td>键空间通知，所有通知以<code>__keyspace@&lt;db&gt;__</code> 为前缀</td>
-</tr>
-<tr>
-<td>E</td>
-<td>键事件通知，所有通知以<code>__keyevent@&lt;db&gt;__</code> 为前缀</td>
-</tr>
-<tr>
-<td>g</td>
-<td><code>DEL</code>、<code>EXPIRE</code>、<code>RENAME</code>等类型无关的通用命令的通知</td>
-</tr>
-<tr>
-<td>$</td>
-<td>字符串命令的通知</td>
-</tr>
-<tr>
-<td>l</td>
-<td>列表命令的通知</td>
-</tr>
-<tr>
-<td>s</td>
-<td>集合命令的通知</td>
-</tr>
-<tr>
-<td>h</td>
-<td>哈希命令的通知</td>
-</tr>
-<tr>
-<td>z</td>
-<td>有序集合命令的通知</td>
-</tr>
-<tr>
-<td>x</td>
-<td>过期事件：每当有过期键被删除时发送</td>
-</tr>
-<tr>
-<td>e</td>
-<td>驱逐<code>(evict)</code>事件：每当有键因为<code>maxmemory</code>政策而被删除时发送</td>
-</tr>
-<tr>
-<td>A</td>
-<td>参数<code>g$lshzxe</code>的别名</td>
-</tr>
-</tbody></table>
-<p>注意，该选项的值中至少需要包含K或者E，否则不会发布任何事件。比如，如果需要开启针对列表的keyspace事件通知，则该选项需要配置为“Kl”； </p>
-<h3 id="键空间和键事件"><a href="#键空间和键事件" class="headerlink" title="键空间和键事件"></a>键空间和键事件</h3><blockquote>
-<p>对于每个修改数据库的操作，键空间通知都会发送两种不同类型的事件</p>
-<p>比如说，对<code>0</code>号数据库的键<code>mykey</code>执行<code>DEL</code>命令时， 系统将分发两条消息， 相当于执行以下两个<code>PUBLISH</code>命令</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PUBLISH __keyspace@0__:mykey del</span><br><span class="line">PUBLISH __keyevent@0__:del mykey</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>__keyspace@0__:mykey</code>：接收<code>0</code>号数据库中所有修改键<code>mykey</code>的事件</li>
-<li><code>__keyevent@0__:del</code>：接收<code>0</code>号数据库中所有执行<code>del</code>命令的键</li>
-</ul>
-<blockquote>
-<p><code>keyspace</code>为前缀的频道被称为键空间通知<code>key-space notification</code></p>
-</blockquote>
-<blockquote>
-<p><code>keyevent</code>为前缀的频道则被称为键事件通知<code>key-event notification</code></p>
-</blockquote>
-<ul>
-<li>订阅<strong>键空间频道</strong>，监控被执行事件的键，如监控<code>mykey</code>；那么此时将接收到该键所对应的事件：<code>del</code></li>
-<li>订阅<strong>键事件频道</strong>，监控某个事件，如<code>del</code>；那么<code>del</code>事件触发时，订阅者收到：<code>mykey</code></li>
-</ul>
-<h3 id="过期的键事件通知"><a href="#过期的键事件通知" class="headerlink" title="过期的键事件通知"></a>过期的键事件通知</h3><ul>
-<li>过期的键事件通知常用在订单过期通知等场景下，此时只需要订阅对应<strong>过期事件</strong>的频道，当某键触发过期事件时，即可接受到对应<strong>过期键</strong>的消息</li>
-<li><code>redis</code>配置如下：</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">notify-keyspace-events &quot;Ex&quot;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>Python</code>代码的简单示范，订阅过期频道</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import redis</span><br><span class="line">import time</span><br><span class="line">redis = redis.Redis(host=&apos;123.57.61.168&apos;, port=6379)</span><br><span class="line">pubsub = redis.pubsub()</span><br><span class="line">pubsub.psubscribe(&apos;__keyevent@0__:expired&apos;) # 订阅过期事件频道</span><br><span class="line">print(&apos;Starting message loop&apos;)</span><br><span class="line">while True:</span><br><span class="line">    try:</span><br><span class="line">        message = pubsub.get_message()</span><br><span class="line">        if message:</span><br><span class="line">            print(message)</span><br><span class="line">        else:</span><br><span class="line">            time.sleep(0.01)</span><br><span class="line">    except KeyboardInterrupt:</span><br><span class="line">        # CTRL + C</span><br><span class="line">        break</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>那么当此时执行此段代码，另起<code>redis</code>客户端，设置一个可以过期的<code>key</code>值，来看一下效果</li>
-</ul>
-<p><img src="/2018/10/16/Redis发布者与订阅者，键空间事件/%E9%94%AE%E8%BF%87%E6%9C%9F%E4%BA%8B%E4%BB%B6%E9%80%9A%E7%9F%A5.gif" alt="键过期事件通知"></p>
-<h3 id="不同命令产生的事件通知"><a href="#不同命令产生的事件通知" class="headerlink" title="不同命令产生的事件通知"></a>不同命令产生的事件通知</h3><ul>
-<li>DEL 命令为每个被删除的键产生一个 del 事件；</li>
-<li>RENAME 产生两个事件：为源键产生一个 rename_from 事件，并为目标键产生一个 rename_to 事件；</li>
-<li>EXPIRE命令，在设置键的过期时间时产生一个 expire事件；当键因过期而被删除时，产生一个 expired事件；</li>
-<li>SORT命令，在带有 STORE 参数时产生一个 sortstore事件。如果 STORE 指示的用于保存排序结果的键已经存在，则原键会被删除，因此还会产生一个 del 事件；</li>
-<li>SET 以及它的所有变种(SETEX、SETNX和GETSET)都产生set事件。另外，SETEX命令还会产生expire 事件；</li>
-<li>MSET 命令，为每个键产生一个 set 事件；</li>
-<li>SETRANGE 产生一个 setrange 事件；</li>
-<li>INCR 、DECR、INCRBY和DECRBY都产生 incrby 事件；</li>
-<li>INCRBYFLOAT产生incrbyfloat事件；</li>
-<li>APPEND产生append事件；</li>
-<li>LPUSH和LPUSHX都产生单个 lpush 事件，即使有多个输入元素时，也是如此；</li>
-<li>RPUSH 和 RPUSHX 都产生单个rpush事件，即使有多个输入元素时，也是如此；</li>
-<li>RPOP 产生 rpop 事件，如果被弹出的元素是列表的最后一个元素，那么还会产生一个 del 事件；</li>
-<li>LPOP 产生 lpop 事件，如果被弹出的元素是列表的最后一个元素，那么还会产生一个 del 事件；</li>
-<li>LINSERT 产生一个 linsert 事件；</li>
-<li>LSET 产生一个 lset 事件；</li>
-<li>LREM产生一个lrem事件，如果该命令执行之后，列表键被清空，则还会产生一个 del 事件；</li>
-<li>LTRIM 产生一个ltrim事件，如果该命令执行之后，列表键被清空，则还会产生一个 del 事件；</li>
-<li>RPOPLPUSH 和 BRPOPLPUSH 产生一个 rpop 事件，以及一个 lpush 事件。两个命令都保证rpop事件在 lpush 事件之前发出。如果弹出元素之后，列表键被清空，则还会产生一个 del 事件；</li>
-<li>HSET 、 HSETNX 和 HMSET 都只产生一个 hset 事件；</li>
-<li>HINCRBY 产生一个 hincrby 事件；</li>
-<li>HINCRBYFLOAT 产生一个 hincrbyfloat 事件；</li>
-<li>HDEL 产生一个 hdel 通知。如果执行该命令之后，哈希键被清空，则还会产生一个del事件；</li>
-<li>SADD 产生一个 sadd 事件，即使有多个输入元素时，也是如此；</li>
-<li>SREM 产生一个 srem 事件，如果执行该命令之后，集合键被清空，则还会产生一个 del 事件；</li>
-<li>SMOVE 为源键产生一个 srem 事件，并为目标键产生一个sadd 事件；</li>
-<li>SPOP 产生一个 spop 事件。如果执行该命令之后，集合键被清空，则还会产生一个 del 事件；</li>
-<li>SINTERSTORE、SUNIONSTORE和SDIFFSTORE分别产生 sinterstore、sunionostore和sdiffstore 三种事件。如果用于保存结果的键已经存在，则还会产生一个 del 事件；</li>
-<li>ZINCR产生一个 zincr 事件；</li>
-<li>ZADD 产生一个 zadd事件，即使有多个输入元素时，也是如此；</li>
-<li>ZREM 产生一个 zrem 通知，即使有多个输入元素时，也是如此。如果执行 ZREM 之后，有序集合键被清空，则还会产生一个 del 事件；</li>
-<li>ZREMEBYSCORE 产生一个 zrembyscore事件，如果用于保存结果的键已经存在，则还会产生一个 del 事件。</li>
-<li>ZREMBYRANK 产生一个 zrembyrank事件，如果用于保存结果的键已经存在，则还会产生一个 del 事件。</li>
-<li>ZINTERSTORE 和 ZUNIONSTORE 分别产生 zinterstore 和 zunionstore 两种事件。如果用于保存结果的键已经存在，那么还会产生一个 del 事件。</li>
-<li>每当一个键因为过期而被删除时，产生一个 expired 事件。</li>
-<li>每当一个键因为 maxmemory策略而被删除并回收内存时，产生一个 evicted 事件。</li>
-</ul>
-<p>注意：所有命令都只在键真的被改动了之后，才会产生事件通知。比如，当srem命令试图删除不存在于集合的元素时，删除操作执行失败，因为没有真正的改动键，所以这一操作不会发送通知。</p>
-<h3 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h3><p><strong>1：Redis发布所有通知，客户端A订阅所有消息：</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config set notify-keyspace-events KEA</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; psubscribe key*@0:*</span><br><span class="line">Reading messages... (press Ctrl-C to quit)</span><br><span class="line">1) &quot;psubscribe&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) (integer) 1</span><br></pre></td></tr></table></figure>
-
-<p>然后，在客户端B上执行set和del命令：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set msg &quot;hello&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; del msg</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; del msg</span><br><span class="line">(integer) 0</span><br></pre></td></tr></table></figure>
-
-<p>然后客户端A的打印如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;set&quot;</span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;__key@0:*&quot;</span><br><span class="line">3) &quot;keyevent@0__:set&quot;</span><br><span class="line">4) &quot;msg&quot;</span><br><span class="line"></span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;del&quot;</span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;__key@0:*&quot;</span><br><span class="line">3) &quot;keyevent@0__:del&quot;</span><br><span class="line">4) &quot;msg&quot;</span><br></pre></td></tr></table></figure>
-
-<p> 可见，针对每一个操作，客户端A都收到了两种消息，分别是keyspace和keyevent消息。</p>
-<p><strong>2：使Redis仅发布keyspace通知，而客户端A订阅所有消息类型：</strong></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1:6379&gt; config set notify-keyspace-events KA</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; psubscribe key*@0:*</span><br><span class="line">Reading messages... (press Ctrl-C to quit)</span><br><span class="line">1) &quot;psubscribe&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) (integer) 1</span><br></pre></td></tr></table></figure>
-
-<p>在客户端B上执行，与上面同样的步骤。此时，客户端A上的打印：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;set&quot;</span><br><span class="line"></span><br><span class="line">1) &quot;pmessage&quot;</span><br><span class="line">2) &quot;key*@0:*&quot;</span><br><span class="line">3) &quot;keyspace@0:msg&quot;</span><br><span class="line">4) &quot;del&quot;</span><br></pre></td></tr></table></figure>
-
-<p>可见，尽管客户端A订阅了所有消息，但是Redis仅发布了keyspace事件。而且，在客户端B上执行了两次del操作，而只有第一个del成功执行了，从而产生了一个事件。</p>
-]]></content>
-      <categories>
-        <category>Redis</category>
-      </categories>
-      <tags>
-        <tag>Redis 发布者与订阅者,键空间事件</tag>
       </tags>
   </entry>
   <entry>
